@@ -1,13 +1,9 @@
-package ru.yandex.practicum.filmorate.FilmTest;
+package ru.yandex.practicum.filmorate.model;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.yandex.practicum.filmorate.controller.FilmController;
-import ru.yandex.practicum.filmorate.model.Film;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -30,8 +26,7 @@ public class FilmTest {
 
     @Test
     public void addFilmTest() {
-        Film film = new Film(1, "asdasd", "12312", LocalDate.of(1900,10,10), 100);
-        film.setDuration(-100);
+        Film film = new Film(1, "", "12312", LocalDate.of(1900,10,10), 100);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
 
         Assertions.assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("должно быть не меньше 1")));

@@ -22,6 +22,9 @@ public class UserController {
 
     @PostMapping
     public User add(@Valid @RequestBody User user) {
+        if (user.getName().equals("")) {
+            user.setName(user.getLogin());
+        }
         users.add(user);
         return user;
     }

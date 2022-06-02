@@ -21,7 +21,7 @@ public class Film {
     @NotBlank
     @NotNull
     private String name;
-    @Size(max = 1, message = "{не может быть больше 200}")
+    @Size(max = 200, message = "{не может быть больше 200}")
     private String description;
     @DateAfter
     private LocalDate releaseDate;
