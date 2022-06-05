@@ -24,10 +24,40 @@ public class UserTest {
     }
 
     @Test
-    public void addFilmTest() {
+    public void validateUserEmailNotBlankTest() {
         User user = new User();
+        user.setEmail("");
         Set<ConstraintViolation<User>> violations = validator.validate(user);
 
-        Assertions.assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("должно быть не меньше 1")));
+        Assertions.assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("не должно быть пустым")));
+        Assertions.assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("не должно равняться null")));
+    }
+
+    @Test
+    public void validateUserEmailTest() {
+        User user = new User();
+        user.setEmail("useremail.test");
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+
+        Assertions.assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("должно иметь формат адреса электронной почты")));
+    }
+
+    @Test
+    public void validateUserLoginTest() {
+        User user = new User();
+        user.setLogin(" ");
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+
+        Assertions.assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("не должно быть пустым")));
+        Assertions.assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("должно соответствовать \"\\S+\"")));
+    }
+
+    @Test
+    public void validateUserBirthdayTest() {
+        User user = new User();
+        user.setBirthday(LocalDate.now().plusDays(1));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+
+        Assertions.assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("должно содержать прошедшую дату или сегодняшнее число")));
     }
 }

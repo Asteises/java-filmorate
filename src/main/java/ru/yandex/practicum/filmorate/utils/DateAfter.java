@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Constraint(validatedBy = DateValidator.class)
 public @interface DateAfter {
-    String message() default "{DateAfter.invalid}";
+    String message() default "DateAfter.invalid";
 
     Class<?>[] groups() default {};
 

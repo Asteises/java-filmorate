@@ -25,8 +25,38 @@ public class FilmTest {
     }
 
     @Test
-    public void addFilmTest() {
-        Film film = new Film(1, "", "12312", LocalDate.of(1900,10,10), 100);
+    public void validateFilmNameTest() {
+        Film film = new Film();
+        film.setName("");
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+
+        Assertions.assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("должно быть не меньше 1")));
+    }
+
+    @Test
+    public void validateFilmDescriptionTest() {
+        Film film = new Film();
+        film.setDescription("11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111" +
+                "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111" +
+                "11111111111");
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+
+        Assertions.assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("не может быть больше 200")));
+    }
+
+    @Test
+    public void validateFilmReleaseDateTest() {
+        Film film = new Film();
+        film.setReleaseDate(LocalDate.of(1984, 12, 1));
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+
+        Assertions.assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("DateAfter.invalid")));
+    }
+
+    @Test
+    public void validateFilmDurationTest() {
+        Film film = new Film();
+        film.setDuration(0);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
 
         Assertions.assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("должно быть не меньше 1")));
