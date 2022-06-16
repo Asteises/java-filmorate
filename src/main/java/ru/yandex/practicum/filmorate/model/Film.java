@@ -22,8 +22,6 @@ import java.util.Set;
 @NoArgsConstructor
 public class Film {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @NotBlank
     @NotNull

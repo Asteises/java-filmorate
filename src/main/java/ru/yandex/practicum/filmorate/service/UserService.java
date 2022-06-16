@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exeption.UserNotFound;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
@@ -18,19 +19,21 @@ public class UserService {
         this.inMemoryUserStorage = inMemoryUserStorage;
     }
 
-    public void addFriend(long userId, long friendId) {
+    public void addFriend(long userId, long friendId) throws UserNotFound {
         if (inMemoryUserStorage.getUsers().containsKey(userId) &&
                 inMemoryUserStorage.getUsers().containsKey(friendId)) {
             inMemoryUserStorage.getUsers().get(userId).getFriends().add(friendId);
+            inMemoryUserStorage.getUsers().get(friendId).getFriends().add(userId);
         }
         log.info("User not found: {} or {}", userId, friendId);
-        throw new RuntimeException("User не найден");
+        throw new UserNotFound("User не найден");
     }
 
     public void deleteFriend(long userId, long friendId) {
         if (inMemoryUserStorage.getUsers().containsKey(userId) &&
                 inMemoryUserStorage.getUsers().containsKey(friendId)) {
             inMemoryUserStorage.getUsers().get(userId).getFriends().remove(friendId);
+            inMemoryUserStorage.getUsers().get(friendId).getFriends().remove(userId);
         }
         log.info("User not found: {} or {}", userId, friendId);
         throw new RuntimeException("User не найден");
@@ -40,9 +43,7 @@ public class UserService {
         List<User> friends = new ArrayList<>();
         if (inMemoryUserStorage.getUsers().containsKey(userId)) {
             for (Long id: inMemoryUserStorage.getUsers().get(userId).getFriends()) {
-                if (inMemoryUserStorage.getUsers().containsKey(id)) {
-                    friends.add(inMemoryUserStorage.getUsers().get(id));
-                }
+                friends.add(inMemoryUserStorage.getUsers().get(id));
             }
             return friends;
         }
@@ -51,17 +52,9 @@ public class UserService {
     }
 
     public List<User> getAllCommonFriends(long userId, long otherUserId) {
-        List<User> commonFriends = new ArrayList<>();
-        User user = inMemoryUserStorage.getUsers().get(userId);
-        if (inMemoryUserStorage.getUsers().containsKey(userId) && inMemoryUserStorage.getUsers().containsKey(otherUserId)) {
-            for (Long id: user.getFriends()) {
-                if (inMemoryUserStorage.getUsers().get(otherUserId).getFriends().contains(id)) {
-                    commonFriends.add(user);
-                }
-            }
-            return commonFriends;
-        }
-        log.info("User not found: {} or {}", userId, otherUserId);
-        throw new RuntimeException("User не найден");
+        List<User> friendsUser = getAllFriends(userId);
+        List<User> friendsOtherUser = getAllFriends(otherUserId);
+        friendsUser.retainAll(friendsOtherUser);
+        return friendsUser;
     }
 }

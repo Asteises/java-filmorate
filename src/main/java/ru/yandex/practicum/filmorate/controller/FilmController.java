@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -72,8 +73,8 @@ public class FilmController {
         return ResponseEntity.ok("Like delete");
     }
 
-    @GetMapping("/popular?count={count}")
-    public ResponseEntity<String> getPopularFilms(@PathVariable int count) {
+    @GetMapping("/popular")
+    public ResponseEntity<String> getPopularFilms(@RequestParam int count) {
         filmService.getPopularFilms(count);
         return ResponseEntity.ok("All popular films found");
     }
