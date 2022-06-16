@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -34,7 +35,14 @@ public class FilmService {
     }
 
     public List<Film> getPopularFilms(int count) {
-
+        return null;
     }
 
+    public static final Comparator<Film> COMPARE_BY_COUNT = new Comparator<Film>() {
+
+        @Override
+        public int compare(Film f1, Film f2) {
+            return f1.getLikes().size() - f2.getLikes().size();
+        }
+    };
 }
