@@ -8,7 +8,7 @@ public class DateValidator implements ConstraintValidator<DateAfter, LocalDate> 
     @Override
     public boolean isValid(LocalDate localDate, ConstraintValidatorContext constraintValidatorContext) {
         if (localDate != null) {
-            return !localDate.isBefore(LocalDate.of(1895, 12, 28));
+            return localDate.isAfter(LocalDate.of(1895, 12, 28));
         }
         return true;
     }

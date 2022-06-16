@@ -11,38 +11,43 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
 @RequestMapping("/films")
 public class FilmController {
-
-    private List<Film> films = new ArrayList<>();
+    private Map<Integer, Film> films;
+    private int id = 1;
+    public FilmController() {
+        this.films = new HashMap();
+    }
 
     @PostMapping
     public Film add(@Valid @RequestBody Film film) {
-        films.add(film);
+        film.setId(id++);
+        films.put(film.getId(), film);
+        log.info("Film has been created: {}", film);
         return film;
     }
 
     @GetMapping
     public List<Film> getAll() {
-        return films;
+        return new ArrayList<>(films.values());
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        for (Film f: films) {
-            if (f.getId() == film.getId()) {
-                f.setName(film.getName());
-                f.setDescription(film.getDescription());
-                f.setReleaseDate(film.getReleaseDate());
-                f.setDuration(film.getDuration());
-                return f;
-            }
+
+        if (films.get(film.getId()) != null) {
+            films.put(film.getId(), film);
+            log.info("Film has been updated: {}", film);
+            return film;
         }
+
         log.info("Film not found: {}", film.getId());
-        return null;
+        throw new RuntimeException("Film не найден");
     }
 }

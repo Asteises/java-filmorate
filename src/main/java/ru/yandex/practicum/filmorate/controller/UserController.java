@@ -11,38 +11,46 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
 @RequestMapping("/users")
 public class UserController {
 
-    private List<User> users = new ArrayList<>();
+    private Map<Integer, User> users;
+    private int id = 1;
+
+    public UserController() {
+        this.users = new HashMap<>();
+    }
 
     @PostMapping
     public User add(@Valid @RequestBody User user) {
-        users.add(user);
+        if (user.getName().equals("")) {
+            user.setName(user.getLogin());
+        }
+        user.setId(id++);
+        users.put(user.getId(), user);
+        log.info("User has been created: {}", user);
         return user;
     }
 
     @GetMapping
     public List<User> getAll() {
-        return users;
+        return new ArrayList<>(users.values());
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        for (User u: users) {
-            if (u.getId() == user.getId()) {
-                u.setBirthday(user.getBirthday());
-                u.setEmail(user.getEmail());
-                u.setLogin(user.getLogin());
-                u.setName(user.getName());
-                return u;
-            }
+        if (users.containsKey(user.getId())) {
+            users.put(user.getId(), user);
+            log.info("User has been updated: {}", user);
+            return user;
         }
         log.info("User not found: {}", user.getId());
-        return null;
+        throw new RuntimeException("User не найден");
     }
 }
