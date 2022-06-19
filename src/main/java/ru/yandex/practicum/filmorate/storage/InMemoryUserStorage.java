@@ -50,7 +50,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        if (users.containsValue(user)) {
+        if (users.containsKey(user.getId())) {
             users.put(user.getId(), user);
             log.info("User has been updated: {}", user);
             return user;
