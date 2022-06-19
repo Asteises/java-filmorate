@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,48 +17,44 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @Slf4j
 @RequestMapping("/films")
 public class FilmController {
 
-    private final InMemoryFilmStorage inMemoryFilmStorage;
-
     private final FilmService filmService;
 
-    public FilmController(InMemoryFilmStorage inMemoryFilmStorage, FilmService filmService) {
-        this.inMemoryFilmStorage = inMemoryFilmStorage;
+    public FilmController(FilmService filmService) {
         this.filmService = filmService;
     }
 
     @PostMapping
     public ResponseEntity<String> addFilm(@Valid @RequestBody Film film) {
-        inMemoryFilmStorage.addFilm(film);
+        filmService.addFilm(film);
         return ResponseEntity.ok(film.getId() + " Film has been created");
     }
 
     @GetMapping
-    public ResponseEntity<String> getAllFilms() {
-        inMemoryFilmStorage.getAllFilms();
-        return ResponseEntity.ok("All films found");
+    public ResponseEntity<List<Film>> getAllFilms() {
+        return new ResponseEntity<>(filmService.getAllFilms(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<String> getFilmById(@PathVariable long id) {
-        inMemoryFilmStorage.getFilmById(id);
-        return ResponseEntity.ok("Film found");
+    public ResponseEntity<Film> getFilmById(@PathVariable long id) {
+        return new ResponseEntity<>(filmService.getFilmById(id), HttpStatus.OK);
     }
 
     @PutMapping
     public ResponseEntity<String> updateFilm(@Valid @RequestBody Film film) {
-        inMemoryFilmStorage.updateFilm(film);
+        filmService.updateFilm(film);
         return ResponseEntity.ok(film.getId() + " Film has been updated");
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteFilm(@PathVariable long id) {
-        inMemoryFilmStorage.deleteFilm(id);
+        filmService.deleteFilm(id);
         return ResponseEntity.ok("Film delete");
     }
 
@@ -74,8 +71,7 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<String> getPopularFilms(@RequestParam int count) {
-        filmService.getPopularFilms(count);
-        return ResponseEntity.ok("All popular films found");
+    public ResponseEntity<List<Film>> getPopularFilms(@RequestParam int count) {
+        return new ResponseEntity<>(filmService.getPopularFilms(count), HttpStatus.OK);
     }
 }

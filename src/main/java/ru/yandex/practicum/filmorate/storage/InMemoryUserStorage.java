@@ -39,6 +39,7 @@ public class InMemoryUserStorage implements UserStorage {
         return new ArrayList<>(users.values());
     }
 
+    @Override
     public User getUserById(long userId) {
         if (users.containsKey(userId)) {
             return users.get(userId);

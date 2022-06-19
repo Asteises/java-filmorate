@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,48 +17,43 @@ import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @Slf4j
 @RequestMapping("/users")
 public class UserController {
-
-    private final InMemoryUserStorage inMemoryUserStorage;
-
     private final UserService userService;
 
-    public UserController(InMemoryUserStorage inMemoryUserStorage, UserService userService) {
-        this.inMemoryUserStorage = inMemoryUserStorage;
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @PostMapping
     public ResponseEntity<String> addUser(@Valid @RequestBody User user) {
-        inMemoryUserStorage.addUser(user);
+        userService.addUser(user);
         return ResponseEntity.ok(user.getId() + " User has been created");
     }
 
     @GetMapping
-    public ResponseEntity<String> getAllUsers() {
-        inMemoryUserStorage.getAllUsers();
-        return ResponseEntity.ok("All users found");
+    public ResponseEntity<List<User>> getAllUsers() {
+        return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<String> getUserById(@PathVariable long id) {
-        inMemoryUserStorage.getUserById(id);
-        return ResponseEntity.ok("User found");
+    public ResponseEntity<User> getUserById(@PathVariable long id) {
+        return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
     }
 
     @PutMapping
     public ResponseEntity<String> updateUser(@Valid @RequestBody User user) {
-        inMemoryUserStorage.updateUser(user);
+        userService.updateUser(user);
         return ResponseEntity.ok(user.getId() + " User has been updated");
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable long id) {
-        inMemoryUserStorage.deleteUser(id);
+        userService.deleteUser(id);
         return ResponseEntity.ok("User delete");
     }
 
@@ -74,14 +70,12 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends")
-    public ResponseEntity<String> getAllFriends(@PathVariable long id) {
-        userService.getAllFriends(id);
-        return ResponseEntity.ok("All friends found");
+    public ResponseEntity<List<User>> getAllFriends(@PathVariable long id) {
+        return new ResponseEntity<>(userService.getAllFriends(id), HttpStatus.OK);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public ResponseEntity<String> getAllCommonFriends(@PathVariable long id, @PathVariable long otherId) {
-        userService.getAllCommonFriends(id, otherId);
-        return ResponseEntity.ok("All common friends found");
+    public ResponseEntity<List<User>> getAllCommonFriends(@PathVariable long id, @PathVariable long otherId) {
+        return new ResponseEntity<>(userService.getAllCommonFriends(id, otherId), HttpStatus.OK);
     }
 }
