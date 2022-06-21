@@ -3,10 +3,18 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.exeption.UserNotFound;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -22,9 +30,9 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> addUser(@Valid @RequestBody User user) {
+    public ResponseEntity<User> addUser(@Valid @RequestBody User user) {
         userService.addUser(user);
-        return new ResponseEntity(HttpStatus.OK);
+        return ResponseEntity.ok(user);
     }
 
     @GetMapping
@@ -38,21 +46,21 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<String> updateUser(@Valid @RequestBody User user) {
+    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
         userService.updateUser(user);
-        return ResponseEntity.ok(user.getId() + " User has been updated");
+        return ResponseEntity.ok(user);
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable long id) {
         userService.deleteUser(id);
-        return ResponseEntity.ok("User delete");
+        return ResponseEntity.ok("");
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public ResponseEntity<String> addFriend(@PathVariable long id, @PathVariable long friendId) throws UserNotFound {
+    public ResponseEntity<User> addFriend(@PathVariable long id, @PathVariable long friendId) throws UserNotFound {
         userService.addFriend(id, friendId);
-        return ResponseEntity.ok("Friend has been added");
+        return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
