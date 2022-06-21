@@ -40,8 +40,8 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable long id) throws UserNotFound {
-        return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
+    public ResponseEntity<User> getUserById(@PathVariable String id) throws UserNotFound {
+        return new ResponseEntity<>(userService.getUserById(Long.parseLong(id)), HttpStatus.OK);
     }
 
     @PutMapping
