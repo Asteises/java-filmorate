@@ -20,8 +20,9 @@ public class UserService {
         this.userStorage = inMemoryUserStorage;
     }
 
-    public void addUser(User user) {
+    public User addUser(User user) {
         userStorage.addUser(user);
+        return user;
     }
 
     public List<User> getAllUsers() {
