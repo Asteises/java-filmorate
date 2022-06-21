@@ -22,6 +22,8 @@ import java.util.Set;
 @NoArgsConstructor
 public class Film {
 
+    @NotBlank
+    @NotNull
     private long id;
     @NotBlank
     @NotNull

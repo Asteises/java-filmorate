@@ -2,21 +2,14 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PastOrPresent;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.Map;
 import java.util.Set;
 
 @Data
 public class User {
-
+    @NotBlank
+    @NotNull
     private long id;
     @NotBlank
     @NotNull
