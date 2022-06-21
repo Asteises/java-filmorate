@@ -42,12 +42,8 @@ public class UserService {
     }
 
     public void addFriend(long userId, long friendId) throws UserNotFound {
-
         userStorage.getUserById(userId).getFriends().add(friendId);
         userStorage.getUserById(friendId).getFriends().add(userId);
-
-        log.info("User not found: {} or {}", userId, friendId);
-        throw new UserNotFound("User не найден");
     }
 
     public void deleteFriend(long userId, long friendId) throws UserNotFound {
