@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exeption.FilmNotFound;
 import ru.yandex.practicum.filmorate.exeption.UserNotFound;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -33,19 +34,19 @@ public class FilmService {
         return filmStorage.getAllFilms();
     }
 
-    public Film getFilmById(long filmId) {
+    public Film getFilmById(long filmId) throws FilmNotFound {
         return filmStorage.getFilmById(filmId);
     }
 
-    public void updateFilm(Film film) {
+    public void updateFilm(Film film) throws FilmNotFound {
         filmStorage.updateFilm(film);
     }
 
-    public void deleteFilm(long filmId) {
+    public void deleteFilm(long filmId) throws FilmNotFound {
         filmStorage.deleteFilm(filmId);
     }
 
-    public void addLikeToFilm(long filmId, long userId) throws UserNotFound {
+    public void addLikeToFilm(long filmId, long userId) throws UserNotFound, FilmNotFound {
         if (filmStorage.getAllFilms().contains(filmStorage.getFilmById(filmId)) &&
                 userStorage.getAllUsers().contains(userStorage.getUserById(userId))) {
             filmStorage.getFilmById(filmId).getLikes().add(userId);
@@ -56,7 +57,7 @@ public class FilmService {
         throw new RuntimeException("User или Film не найден");
     }
 
-    public void deleteLikeFromFilm(long filmId, long userId) throws UserNotFound {
+    public void deleteLikeFromFilm(long filmId, long userId) throws UserNotFound, FilmNotFound {
         if (filmStorage.getAllFilms().contains(filmStorage.getFilmById(filmId)) &&
                 userStorage.getAllUsers().contains(userStorage.getUserById(userId))) {
             filmStorage.getFilmById(filmId).getLikes().remove(userId);

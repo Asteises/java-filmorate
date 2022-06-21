@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.filmorate.exeption.FilmNotFound;
 import ru.yandex.practicum.filmorate.exeption.UserNotFound;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -42,30 +43,30 @@ public class FilmController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Film> getFilmById(@PathVariable long id) {
+    public ResponseEntity<Film> getFilmById(@PathVariable long id) throws FilmNotFound {
         return new ResponseEntity<>(filmService.getFilmById(id), HttpStatus.OK);
     }
 
     @PutMapping
-    public ResponseEntity<String> updateFilm(@Valid @RequestBody Film film) {
+    public ResponseEntity<String> updateFilm(@Valid @RequestBody Film film) throws FilmNotFound {
         filmService.updateFilm(film);
         return ResponseEntity.ok(film.getId() + " Film has been updated");
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteFilm(@PathVariable long id) {
+    public ResponseEntity<String> deleteFilm(@PathVariable long id) throws FilmNotFound {
         filmService.deleteFilm(id);
         return ResponseEntity.ok("Film delete");
     }
 
     @PutMapping("{id}/like/{userId}")
-    public ResponseEntity<String> addLikeToFilm(@PathVariable long id, @PathVariable long userId) throws UserNotFound {
+    public ResponseEntity<String> addLikeToFilm(@PathVariable long id, @PathVariable long userId) throws UserNotFound, FilmNotFound {
         filmService.addLikeToFilm(id, userId);
         return ResponseEntity.ok("Like add");
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public ResponseEntity<String> deleteLikeFromFilm(@PathVariable long id, @PathVariable long userId) throws UserNotFound {
+    public ResponseEntity<String> deleteLikeFromFilm(@PathVariable long id, @PathVariable long userId) throws UserNotFound, FilmNotFound {
         filmService.deleteLikeFromFilm(id, userId);
         return ResponseEntity.ok("Like delete");
     }
