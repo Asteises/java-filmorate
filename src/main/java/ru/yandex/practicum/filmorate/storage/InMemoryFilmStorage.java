@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exeption.FilmNotFound;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.ArrayList;
@@ -35,32 +36,32 @@ public class InMemoryFilmStorage implements FilmStorage {
         return new ArrayList<>(films.values());
     }
 
-    public Film getFilmById(long filmId) {
+    public Film getFilmById(long filmId) throws FilmNotFound {
         if (films.containsKey(filmId)) {
             return films.get(filmId);
         }
         log.info("Film not found: {}", filmId);
-        throw new RuntimeException("Film не найден");
+        throw new FilmNotFound("Film не найден");
     }
 
     @Override
-    public Film updateFilm(Film film) {
+    public Film updateFilm(Film film) throws FilmNotFound {
         if (films.containsKey(film.getId())) {
             films.put(film.getId(), film);
             log.info("Film has been updated: {}", film);
             return film;
         }
         log.info("Film not found: {}", film.getId());
-        throw new RuntimeException("Film не найден");
+        throw new FilmNotFound("Film не найден");
     }
 
     @Override
-    public void deleteFilm(long filmId) {
+    public void deleteFilm(long filmId) throws FilmNotFound {
         if (films.containsKey(filmId)) {
             films.remove(filmId);
             log.info("Film delete");
         }
         log.info("Film not found: {}", filmId);
-        throw new RuntimeException("Film не найден");
+        throw new FilmNotFound("Film не найден");
     }
 }

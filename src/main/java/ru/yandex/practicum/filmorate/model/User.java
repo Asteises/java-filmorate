@@ -8,8 +8,7 @@ import java.util.Set;
 
 @Data
 public class User {
-    @NotBlank
-    @NotNull
+
     private long id;
     @NotBlank
     @NotNull

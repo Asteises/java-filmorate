@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exeption.UserNotFound;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
@@ -40,32 +41,32 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getUserById(long userId) {
+    public User getUserById(long userId) throws UserNotFound {
         if (users.containsKey(userId)) {
             return users.get(userId);
         }
         log.info("User not found: {}", userId);
-        throw new RuntimeException("User не найден");
+        throw new UserNotFound("User не найден");
     }
 
     @Override
-    public User updateUser(User user) {
+    public User updateUser(User user) throws UserNotFound {
         if (users.containsKey(user.getId())) {
             users.put(user.getId(), user);
             log.info("User has been updated: {}", user);
             return user;
         }
         log.info("User not found: {}", user.getId());
-        throw new RuntimeException("User не найден");
+        throw new UserNotFound("User не найден");
     }
 
     @Override
-    public void deleteUser(long userId) {
+    public void deleteUser(long userId) throws UserNotFound {
         if (users.containsKey(userId)) {
             users.remove(userId);
             log.info("User delete");
         }
         log.info("User not found: {}", userId);
-        throw new RuntimeException("User не найден");
+        throw new UserNotFound("User не найден");
     }
 }

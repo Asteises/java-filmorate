@@ -28,19 +28,20 @@ public class UserService {
         return userStorage.getAllUsers();
     }
 
-    public User getUserById(long userId) {
+    public User getUserById(long userId) throws UserNotFound {
        return userStorage.getUserById(userId);
     }
 
-    public void updateUser(User user) {
+    public void updateUser(User user) throws UserNotFound {
         userStorage.updateUser(user);
     }
 
-    public void deleteUser(long id) {
+    public void deleteUser(long id) throws UserNotFound {
         userStorage.deleteUser(id);
     }
 
     public void addFriend(long userId, long friendId) throws UserNotFound {
+
         userStorage.getUserById(userId).getFriends().add(friendId);
         userStorage.getUserById(friendId).getFriends().add(userId);
 
@@ -48,26 +49,18 @@ public class UserService {
         throw new UserNotFound("User не найден");
     }
 
-    public void deleteFriend(long userId, long friendId) {
+    public void deleteFriend(long userId, long friendId) throws UserNotFound {
         userStorage.getUserById(userId).getFriends().remove(friendId);
         userStorage.getUserById(friendId).getFriends().remove(userId);
-
-        log.info("User not found: {} or {}", userId, friendId);
-        throw new RuntimeException("User не найден");
     }
 
-    public List<User> getAllFriends(long userId) {
-        List<User> friends = new ArrayList<>();
-        if (userStorage.getAllUsers().contains(userStorage.getUserById(userId))) {
-            return friends;
-        }
-        log.info("User not found: {}", userId);
-        throw new RuntimeException("User не найден");
+    public List<Long> getAllFriends(long userId) throws UserNotFound {
+        return new ArrayList<>(userStorage.getUserById(userId).getFriends());
     }
 
-    public List<User> getAllCommonFriends(long userId, long otherUserId) {
-        List<User> friendsUser = getAllFriends(userId);
-        List<User> friendsOtherUser = getAllFriends(otherUserId);
+    public List<Long> getAllCommonFriends(long userId, long otherUserId) throws UserNotFound {
+        List<Long> friendsUser = getAllFriends(userId);
+        List<Long> friendsOtherUser = getAllFriends(otherUserId);
         friendsUser.retainAll(friendsOtherUser);
         return friendsUser;
     }

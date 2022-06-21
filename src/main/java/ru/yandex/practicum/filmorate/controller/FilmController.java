@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.filmorate.exeption.UserNotFound;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -59,13 +59,13 @@ public class FilmController {
     }
 
     @PutMapping("{id}/like/{userId}")
-    public ResponseEntity<String> addLikeToFilm(@PathVariable long id, @PathVariable long userId) {
+    public ResponseEntity<String> addLikeToFilm(@PathVariable long id, @PathVariable long userId) throws UserNotFound {
         filmService.addLikeToFilm(id, userId);
         return ResponseEntity.ok("Like add");
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public ResponseEntity<String> deleteLikeFromFilm(@PathVariable long id, @PathVariable long userId) {
+    public ResponseEntity<String> deleteLikeFromFilm(@PathVariable long id, @PathVariable long userId) throws UserNotFound {
         filmService.deleteLikeFromFilm(id, userId);
         return ResponseEntity.ok("Like delete");
     }

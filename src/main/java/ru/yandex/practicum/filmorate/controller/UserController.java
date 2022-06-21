@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.exeption.UserNotFound;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -41,18 +40,18 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable long id) {
+    public ResponseEntity<User> getUserById(@PathVariable long id) throws UserNotFound {
         return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
     }
 
     @PutMapping
-    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
+    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) throws UserNotFound {
         userService.updateUser(user);
         return ResponseEntity.ok(user);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable long id) {
+    public ResponseEntity<String> deleteUser(@PathVariable long id) throws UserNotFound {
         userService.deleteUser(id);
         return ResponseEntity.ok("");
     }
@@ -64,18 +63,18 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public ResponseEntity<String> deleteFriend(@PathVariable long id, @PathVariable long friendId) {
+    public ResponseEntity<String> deleteFriend(@PathVariable long id, @PathVariable long friendId) throws UserNotFound {
         userService.deleteFriend(id, friendId);
         return ResponseEntity.ok("Friend has been deleted");
     }
 
     @GetMapping("/{id}/friends")
-    public ResponseEntity<List<User>> getAllFriends(@PathVariable long id) {
+    public ResponseEntity<List<Long>> getAllFriends(@PathVariable long id) throws UserNotFound {
         return new ResponseEntity<>(userService.getAllFriends(id), HttpStatus.OK);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public ResponseEntity<List<User>> getAllCommonFriends(@PathVariable long id, @PathVariable long otherId) {
+    public ResponseEntity<List<Long>> getAllCommonFriends(@PathVariable long id, @PathVariable long otherId) throws UserNotFound {
         return new ResponseEntity<>(userService.getAllCommonFriends(id, otherId), HttpStatus.OK);
     }
 }
