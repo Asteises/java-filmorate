@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -64,9 +65,10 @@ public class FilmService {
 
     public List<Film> getPopularFilms(int count) {
         if (count == 0) count = 10;
-        return filmStorage.getAllFilms().stream()
-                .sorted(Comparator.comparing(film -> film.getLikes().size()))
-                .limit(count)
+        List<Film> films = filmStorage.getAllFilms().stream()
+                .sorted(Comparator.comparingInt(film -> film.getLikes().size()))
                 .collect(Collectors.toList());
+        Collections.reverse(films);
+        return films.stream().limit(count).collect(Collectors.toList());
     }
 }
