@@ -71,8 +71,8 @@ public class FilmController {
         return ResponseEntity.ok("Like delete");
     }
 
-    @GetMapping("/popular?count={count}")
-    public ResponseEntity<List<Film>> getPopularFilms(@PathVariable int count) {
-        return new ResponseEntity<>(filmService.getPopularFilms(count), HttpStatus.OK);
+    @GetMapping("/popular")
+    public ResponseEntity<List<Film>> getPopularFilms(@RequestParam(defaultValue = "0") int count) {
+        return ResponseEntity.ok(filmService.getPopularFilms(count));
     }
 }

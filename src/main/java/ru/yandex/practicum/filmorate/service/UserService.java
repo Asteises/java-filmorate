@@ -43,13 +43,17 @@ public class UserService {
     }
 
     public void addFriend(long userId, long friendId) throws UserNotFound {
-        userStorage.getUserById(userId).getFriends().add(friendId);
-        userStorage.getUserById(friendId).getFriends().add(userId);
+        if (userStorage.getUserById(friendId) != null) {
+            userStorage.getUserById(userId).getFriends().add(friendId);
+            userStorage.getUserById(friendId).getFriends().add(userId);
+        }
     }
 
     public void deleteFriend(long userId, long friendId) throws UserNotFound {
-        userStorage.getUserById(userId).getFriends().remove(friendId);
-        userStorage.getUserById(friendId).getFriends().remove(userId);
+        if (userStorage.getUserById(friendId) != null) {
+            userStorage.getUserById(userId).getFriends().remove(friendId);
+            userStorage.getUserById(friendId).getFriends().remove(userId);
+        }
     }
 
     public List<User> getAllFriends(long userId) throws UserNotFound {
