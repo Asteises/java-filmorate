@@ -7,8 +7,9 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -51,13 +52,14 @@ public class UserService {
         userStorage.getUserById(friendId).getFriends().remove(userId);
     }
 
-    public List<Long> getAllFriends(long userId) throws UserNotFound {
-        return new ArrayList<>(userStorage.getUserById(userId).getFriends());
+    public List<User> getAllFriends(long userId) throws UserNotFound {
+        Set<Long> friends = userStorage.getUserById(userId).getFriends();// {2, 3, 6}.stream.map(2 -> user2)
+        return friends.stream().map(userStorage::getUserById).collect(Collectors.toList());
     }
 
-    public List<Long> getAllCommonFriends(long userId, long otherUserId) throws UserNotFound {
-        List<Long> friendsUser = getAllFriends(userId);
-        List<Long> friendsOtherUser = getAllFriends(otherUserId);
+    public List<User> getAllCommonFriends(long userId, long otherUserId) throws UserNotFound {
+        List<User> friendsUser = getAllFriends(userId);
+        List<User> friendsOtherUser = getAllFriends(otherUserId);
         friendsUser.retainAll(friendsOtherUser);
         return friendsUser;
     }
