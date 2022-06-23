@@ -47,14 +47,8 @@ public class FilmService {
     }
 
     public void addLikeToFilm(long filmId, long userId) throws UserNotFound, FilmNotFound {
-        if (filmStorage.getAllFilms().contains(filmStorage.getFilmById(filmId)) &&
-                userStorage.getAllUsers().contains(userStorage.getUserById(userId))) {
-            filmStorage.getFilmById(filmId).getLikes().add(userId);
-            log.info("Like has been add");
-            return;
-        }
-        log.info("User or Film not found: {} or {}", userId, filmId);
-        throw new RuntimeException("User или Film не найден");
+        filmStorage.getFilmById(filmId).getLikes().add(userId);
+        log.info("Like has been add");
     }
 
     public void deleteLikeFromFilm(long filmId, long userId) throws UserNotFound, FilmNotFound {

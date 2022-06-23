@@ -32,9 +32,9 @@ public class FilmController {
     }
 
     @PostMapping
-    public ResponseEntity<String> addFilm(@Valid @RequestBody Film film) {
+    public Film addFilm(@Valid @RequestBody Film film) {
         filmService.addFilm(film);
-        return ResponseEntity.ok(film.getId() + " Film has been created");
+        return film;
     }
 
     @GetMapping
@@ -48,9 +48,9 @@ public class FilmController {
     }
 
     @PutMapping
-    public ResponseEntity<String> updateFilm(@Valid @RequestBody Film film) throws FilmNotFound {
+    public Film updateFilm(@Valid @RequestBody Film film) throws FilmNotFound {
         filmService.updateFilm(film);
-        return ResponseEntity.ok(film.getId() + " Film has been updated");
+        return film;
     }
 
     @DeleteMapping("/delete/{id}")
@@ -71,7 +71,7 @@ public class FilmController {
         return ResponseEntity.ok("Like delete");
     }
 
-    @GetMapping("/popular")
+    @GetMapping("/popular?count={count}")
     public ResponseEntity<List<Film>> getPopularFilms(@RequestParam int count) {
         return new ResponseEntity<>(filmService.getPopularFilms(count), HttpStatus.OK);
     }
