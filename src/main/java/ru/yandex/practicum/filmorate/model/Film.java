@@ -5,14 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.yandex.practicum.filmorate.utils.DateAfter;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -27,6 +22,8 @@ public class Film {
     @NotBlank
     @NotNull
     private String name;
+    private String genre;
+    private String MPA;
     @Size(max = 200, message = "не может быть больше 200")
     private String description;
     @DateAfter
