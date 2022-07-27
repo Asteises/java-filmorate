@@ -5,9 +5,7 @@ import lombok.Data;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 @Data
 public class User {
@@ -24,6 +22,5 @@ public class User {
     private String name;
     @PastOrPresent
     private LocalDate birthday;
-    private Set<Long> friends = new HashSet<>();
-    private Map<Long, Boolean> friendship = new HashMap<>();
+    private Map<Long, Boolean> friends = new HashMap<>();
 }
