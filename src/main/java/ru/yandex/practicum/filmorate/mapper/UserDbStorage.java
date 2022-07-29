@@ -89,8 +89,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     public List<User> getAllCommonFriends(long friendId, long userId) throws UserNotFound {
-        String sqlJoin = "SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?)" +
-                " (SELECT USER_ID FROM FRIENDS WHERE FRIEND_ID = ?)";
+        String sqlJoin = "SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?)";
         List<User> commonFriends = jdbcTemplate.query(sqlJoin, new UserRowMapper(), userId, friendId);
         return commonFriends;
     }
