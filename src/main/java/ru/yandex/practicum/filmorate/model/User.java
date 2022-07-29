@@ -4,7 +4,9 @@ import lombok.Data;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -22,5 +24,6 @@ public class User {
     private String name;
     @PastOrPresent
     private LocalDate birthday;
-    private Map<Long, Boolean> friends = new HashMap<>();
+    private List<User> friends = new ArrayList<>();
+
 }

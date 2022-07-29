@@ -1,17 +1,12 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeption.UserNotFound;
+import ru.yandex.practicum.filmorate.mapper.UserDbStorage;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -19,62 +14,87 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final UserDbStorage userDbStorage;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
+    /**
+     * Добавляем нового User
+     */
     @PostMapping
     public User addUser(@Valid @RequestBody User user) {
-        userService.addUser(user);
+        userDbStorage.addUser(user);
         return user;
     }
 
+    /**
+     * Получаем всех User
+     */
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
-        return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
+        return new ResponseEntity<>(userDbStorage.getAllUsers(), HttpStatus.OK);
     }
 
+    /**
+     * Получаем User по id
+     */
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable String id) throws UserNotFound {
-        return new ResponseEntity<>(userService.getUserById(Long.parseLong(id)), HttpStatus.OK);
+        return new ResponseEntity<>(userDbStorage.getUserById(Long.parseLong(id)), HttpStatus.OK);
     }
 
+    /**
+     * Изменяем существующего User
+     */
     @PutMapping
     public ResponseEntity<User> updateUser(@Valid @RequestBody User user) throws UserNotFound {
-        userService.updateUser(user);
+        userDbStorage.updateUser(user);
         return ResponseEntity.ok(user);
     }
 
+    /**
+     * Удаляем User по id
+     */
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable long id) throws UserNotFound {
-        userService.deleteUser(id);
+        userDbStorage.deleteUser(id);
         return ResponseEntity.ok("");
     }
 
+    /**
+     * Добавляем User в друзья к другому User
+     */
     @PutMapping("/{id}/friends/{friendId}")
     public ResponseEntity<User> addFriend(@PathVariable long id, @PathVariable long friendId) throws UserNotFound {
-        userService.addFriend(id, friendId);
-        return ResponseEntity.ok(userService.getUserById(id));
+        userDbStorage.addFriend(id, friendId);
+        return ResponseEntity.ok(userDbStorage.getUserById(id));
     }
 
+    /**
+     * Удаляем User из друзей другого User
+     */
     @DeleteMapping("/{id}/friends/{friendId}")
     public ResponseEntity<String> deleteFriend(@PathVariable long id, @PathVariable long friendId) throws UserNotFound {
-        userService.deleteFriend(id, friendId);
+        userDbStorage.deleteFriend(id, friendId);
         return ResponseEntity.ok("Friend has been deleted");
     }
 
+    /**
+     * Получаем всех друзей User по id
+     */
     @GetMapping("/{id}/friends")
     public ResponseEntity<List<User>> getAllFriends(@PathVariable long id) throws UserNotFound {
-        return new ResponseEntity<>(userService.getAllFriends(id), HttpStatus.OK);
+        return new ResponseEntity<>(userDbStorage.getAllFriends(id), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}/friends/common/{otherId}")
-    public ResponseEntity<List<User>> getAllCommonFriends(@PathVariable long id, @PathVariable long otherId) throws UserNotFound {
-        return new ResponseEntity<>(userService.getAllCommonFriends(id, otherId), HttpStatus.OK);
+    /**
+     * Получаем всех общих друзей двух User
+     */
+    @GetMapping("/{id}/friends/common/{friendId}")
+    public ResponseEntity<List<User>> getAllCommonFriends(@PathVariable long id, @PathVariable long friendId) throws UserNotFound {
+        return new ResponseEntity<>(userDbStorage.getAllCommonFriends(id, friendId), HttpStatus.OK);
     }
 }

@@ -8,8 +8,6 @@ import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -43,10 +41,10 @@ public class UserService {
     }
 
     public void addFriend(long userId, long friendId) throws UserNotFound {
-        if (userStorage.getUserById(friendId) != null) {
-            userStorage.getUserById(userId).getFriends().add(friendId);
-            userStorage.getUserById(friendId).getFriends().add(userId);
-        }
+//        if (userStorage.getUserById(friendId) != null) {
+//            userStorage.getUserById(userId).getFriends().add(friendId, true);
+//            userStorage.getUserById(friendId).getFriends().put(userId, false);
+//        }
     }
 
     public void deleteFriend(long userId, long friendId) throws UserNotFound {
@@ -56,15 +54,15 @@ public class UserService {
         }
     }
 
-    public List<User> getAllFriends(long userId) throws UserNotFound {
-        Set<Long> friends = userStorage.getUserById(userId).getFriends();// {2, 3, 6}.stream.map(2 -> user2)
-        return friends.stream().map(userStorage::getUserById).collect(Collectors.toList());
-    }
+//    public List<User> getAllFriends(long userId) throws UserNotFound {
+//        Set<Long> friends = userStorage.getUserById(userId).getFriends();// {2, 3, 6}.stream.map(2 -> user2)
+//        return friends.stream().map(userStorage::getUserById).collect(Collectors.toList());
+//    }
 
-    public List<User> getAllCommonFriends(long userId, long otherUserId) throws UserNotFound {
-        List<User> friendsUser = getAllFriends(userId);
-        List<User> friendsOtherUser = getAllFriends(otherUserId);
-        friendsUser.retainAll(friendsOtherUser);
-        return friendsUser;
-    }
+//    public List<User> getAllCommonFriends(long userId, long otherUserId) throws UserNotFound {
+//        List<User> friendsUser = getAllFriends(userId);
+//        List<User> friendsOtherUser = getAllFriends(otherUserId);
+//        friendsUser.retainAll(friendsOtherUser);
+//        return friendsUser;
+//    }
 }
