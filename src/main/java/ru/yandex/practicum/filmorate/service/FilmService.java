@@ -28,7 +28,7 @@ public class FilmService {
     }
 
     public void addFilm(Film film) {
-        filmStorage.addFilm(film);
+//        filmStorage.addFilm(film);
     }
 
     public List<Film> getAllFilms() {
@@ -48,27 +48,28 @@ public class FilmService {
     }
 
     public void addLikeToFilm(long filmId, long userId) throws UserNotFound, FilmNotFound {
-        filmStorage.getFilmById(filmId).getLikes().add(userId);
-        log.info("Like has been add");
+//        filmStorage.getFilmById(filmId).getLikes().add(userId);
+//        log.info("Like has been add");
     }
 
     public void deleteLikeFromFilm(long filmId, long userId) throws UserNotFound, FilmNotFound {
-        if (filmStorage.getAllFilms().contains(filmStorage.getFilmById(filmId)) &&
-                userStorage.getAllUsers().contains(userStorage.getUserById(userId))) {
-            filmStorage.getFilmById(filmId).getLikes().remove(userId);
-            log.info("Like has been deleted");
-            return;
-        }
-        log.info("User or Film not found: {} or {}", userId, filmId);
-        throw new RuntimeException("User или Film не найден");
+//        if (filmStorage.getAllFilms().contains(filmStorage.getFilmById(filmId)) &&
+//                userStorage.getAllUsers().contains(userStorage.getUserById(userId))) {
+//            filmStorage.getFilmById(filmId).getLikes().remove(userId);
+//            log.info("Like has been deleted");
+//            return;
+//        }
+//        log.info("User or Film not found: {} or {}", userId, filmId);
+//        throw new RuntimeException("User или Film не найден");
     }
 
     public List<Film> getPopularFilms(int count) {
-        if (count == 0) count = 10;
-        List<Film> films = filmStorage.getAllFilms().stream()
-                .sorted(Comparator.comparingInt(film -> film.getLikes().size()))
-                .collect(Collectors.toList());
-        Collections.reverse(films);
-        return films.stream().limit(count).collect(Collectors.toList());
+//        if (count == 0) count = 10;
+//        List<Film> films = filmStorage.getAllFilms().stream()
+//                .sorted(Comparator.comparingInt(film -> film.getLikes().size()))
+//                .collect(Collectors.toList());
+//        Collections.reverse(films);
+//        return films.stream().limit(count).collect(Collectors.toList());
+        return null;
     }
 }

@@ -1,17 +1,20 @@
-package ru.yandex.practicum.filmorate.mapper;
+package ru.yandex.practicum.filmorate.repository;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exeption.FilmNotFound;
 import ru.yandex.practicum.filmorate.exeption.UserNotFound;
+import ru.yandex.practicum.filmorate.mapper.UserRowMapper;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
 
 @Data
-@Service
+@Repository
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
 
@@ -39,7 +42,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User getUserById(long id) throws UserNotFound {
         String sql = "SELECT * FROM USERS WHERE ID = ?";
-        String sqlFriends = "SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?)";
+        String sqlFriends = "SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ? AND STATUS IS TRUE)";
         User user = jdbcTemplate.queryForObject(sql, new UserRowMapper(), id);
         List<User> userFriends = jdbcTemplate.query(sqlFriends, new UserRowMapper(), id);
         user.setFriends(userFriends);
@@ -70,29 +73,38 @@ public class UserDbStorage implements UserStorage {
         jdbcTemplate.update(sql, id);
     }
 
-    //TODO Изменить систему: вместо boolean сделать int - 1,2,0, КАК ПРОВЕРИТЬ, ЧТО В ТАБЛИЦЕ УЖЕ ЕСТЬ 1 или 2 чтобы записать 0?
     public void addFriend(long userId, long friendId) throws UserNotFound {
-        String sql = "INSERT INTO FRIENDS VALUES (?, ?, ?)";
-        jdbcTemplate.update(sql, userId, friendId, 1);
-        jdbcTemplate.update(sql, friendId, userId, 2);
+        String sqlForNull = "SELECT COUNT(*) FROM FRIENDS WHERE USER_ID = ? AND FRIEND_ID = ?";
+        if (jdbcTemplate.queryForObject(sqlForNull, Integer.class, userId, friendId) > 0) {
+            String sqlTrue = "UPDATE FRIENDS SET STATUS = TRUE WHERE USER_ID = ? AND FRIEND_ID = ?";
+            jdbcTemplate.update(sqlTrue, userId, friendId);
+        } else {
+            String sql = "INSERT INTO FRIENDS VALUES (?, ?, ?)";
+            jdbcTemplate.update(sql, userId, friendId, Boolean.TRUE);
+            jdbcTemplate.update(sql, friendId, userId, Boolean.FALSE);
+        }
 
     }
 
     public void deleteFriend(long friendId, long userId) throws UserNotFound {
-
-        String sql = "DELETE FROM FRIENDS WHERE FRIEND_ID = ? AND USER_ID = ?";
+        String sql = "UPDATE FRIENDS SET STATUS = 0 WHERE FRIEND_ID = ? AND USER_ID = ?";
         jdbcTemplate.update(sql, friendId, userId);
     }
 
     public List<User> getAllFriends(long id) throws UserNotFound {
-        String sqlJoin = "SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?)";
-        List<User> userFriends = jdbcTemplate.query(sqlJoin, new UserRowMapper(), id);
-        return userFriends;
+        String sqlFriend = "SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ? AND STATUS IS TRUE)";
+        return jdbcTemplate.query(sqlFriend, new UserRowMapper(), id);
     }
 
     public List<User> getAllCommonFriends(long friendId, long userId) throws UserNotFound {
-        String sqlJoin = "SELECT * FROM USERS JOIN FRIENDS f ON ID = f.USER_ID WHERE STATUS = 0";
-        List<User> commonFriends = jdbcTemplate.query(sqlJoin, new UserRowMapper(), userId, friendId);
+        String sqlFriend = "SELECT * FROM (SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ? AND STATUS IS TRUE)) t1 " +
+                "JOIN (SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ? AND STATUS IS TRUE)) t2 ON t2.ID=t1.ID";
+        List<User> commonFriends = jdbcTemplate.query(sqlFriend, new UserRowMapper(), userId, friendId);
         return commonFriends;
+    }
+
+    public void addLike(long userId, long filmId) throws UserNotFound, FilmNotFound {
+        String sql = "INSERT INTO LIKES VALUES (?, ?)";
+        jdbcTemplate.update(sql, filmId, userId);
     }
 }

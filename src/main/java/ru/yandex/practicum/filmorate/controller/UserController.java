@@ -5,8 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exeption.FilmNotFound;
 import ru.yandex.practicum.filmorate.exeption.UserNotFound;
-import ru.yandex.practicum.filmorate.mapper.UserDbStorage;
+import ru.yandex.practicum.filmorate.repository.UserDbStorage;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -78,7 +79,7 @@ public class UserController {
      */
     @DeleteMapping("/{id}/friends/{friendId}")
     public ResponseEntity<String> deleteFriend(@PathVariable long id, @PathVariable long friendId) throws UserNotFound {
-        userDbStorage.deleteFriend(id, friendId);
+        userDbStorage.deleteFriend(friendId, id);
         return ResponseEntity.ok("Friend has been deleted");
     }
 
@@ -96,5 +97,11 @@ public class UserController {
     @GetMapping("/{id}/friends/common/{friendId}")
     public ResponseEntity<List<User>> getAllCommonFriends(@PathVariable long id, @PathVariable long friendId) throws UserNotFound {
         return new ResponseEntity<>(userDbStorage.getAllCommonFriends(id, friendId), HttpStatus.OK);
+    }
+
+    @PostMapping("/{userId}/like/{filmId}")
+    public ResponseEntity<String> addLike(@PathVariable long userId, @PathVariable long filmId) throws UserNotFound, FilmNotFound {
+        userDbStorage.addLike(userId, filmId);
+        return ResponseEntity.ok("Лайк добавлен");
     }
 }
