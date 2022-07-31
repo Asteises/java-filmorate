@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS friends (
     user_id BIGINT,
     friend_id BIGINT,
-    status BOOLEAN
+    status INTEGER
 );
 
 //INSERT INTO users (id, email, login, name)

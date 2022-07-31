@@ -39,9 +39,9 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User getUserById(long id) throws UserNotFound {
         String sql = "SELECT * FROM USERS WHERE ID = ?";
-        String sqlJoin = "SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?)";
+        String sqlFriends = "SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?)";
         User user = jdbcTemplate.queryForObject(sql, new UserRowMapper(), id);
-        List<User> userFriends = jdbcTemplate.query(sqlJoin, new UserRowMapper(), id);
+        List<User> userFriends = jdbcTemplate.query(sqlFriends, new UserRowMapper(), id);
         user.setFriends(userFriends);
         return user;
     }
@@ -70,10 +70,12 @@ public class UserDbStorage implements UserStorage {
         jdbcTemplate.update(sql, id);
     }
 
+    //TODO Изменить систему: вместо boolean сделать int - 1,2,0, КАК ПРОВЕРИТЬ, ЧТО В ТАБЛИЦЕ УЖЕ ЕСТЬ 1 или 2 чтобы записать 0?
     public void addFriend(long userId, long friendId) throws UserNotFound {
         String sql = "INSERT INTO FRIENDS VALUES (?, ?, ?)";
-        jdbcTemplate.update(sql, userId, friendId, Boolean.TRUE);
-        jdbcTemplate.update(sql, friendId, userId, Boolean.FALSE);
+        jdbcTemplate.update(sql, userId, friendId, 1);
+        jdbcTemplate.update(sql, friendId, userId, 2);
+
     }
 
     public void deleteFriend(long friendId, long userId) throws UserNotFound {
@@ -89,7 +91,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     public List<User> getAllCommonFriends(long friendId, long userId) throws UserNotFound {
-        String sqlJoin = "SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?)";
+        String sqlJoin = "SELECT * FROM USERS JOIN FRIENDS f ON ID = f.USER_ID WHERE STATUS = 0";
         List<User> commonFriends = jdbcTemplate.query(sqlJoin, new UserRowMapper(), userId, friendId);
         return commonFriends;
     }
