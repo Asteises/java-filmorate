@@ -25,7 +25,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public FilmDto addFilm(FilmDto film) {
+    public Film addFilm(Film film) {
         film.setId(id++);
 //        films.put(film.getId(), film);
         log.info("Film has been created: {}", film);
@@ -47,7 +47,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public FilmDto updateFilm(FilmDto film) throws FilmNotFound {
+    public Film updateFilm(Film film) throws FilmNotFound {
 //        if (films.containsKey(film.getId())) {
 //            films.put(film.getId(), film);
 //            log.info("Film has been updated: {}", film);

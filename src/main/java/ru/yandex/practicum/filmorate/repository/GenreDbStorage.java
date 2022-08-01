@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.UserNotFound;
 import ru.yandex.practicum.filmorate.mapper.GenreRowMapper;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.User;
 
 @Data
 @Repository

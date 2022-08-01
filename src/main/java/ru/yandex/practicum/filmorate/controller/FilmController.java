@@ -4,18 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.exeption.FilmNotFound;
-import ru.yandex.practicum.filmorate.exeption.UserNotFound;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.repository.FilmDbStorage;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -37,9 +28,9 @@ public class FilmController {
      * Добавляем новый Film
      */
     @PostMapping
-    public FilmDto addFilm(@Valid @RequestBody FilmDto filmDto) {
-        filmDbStorage.addFilm(filmDto);
-        return filmDto;
+    public Film addFilm(@Valid @RequestBody Film film) {
+        filmDbStorage.addFilm(film);
+        return film;
     }
 
     /**
@@ -62,9 +53,8 @@ public class FilmController {
      * Изменяем существующий Film
      */
     @PutMapping
-    public ResponseEntity<FilmDto> updateFilm(@Valid @RequestBody FilmDto filmDto) throws FilmNotFound {
-        filmDbStorage.updateFilm(filmDto);
-        return ResponseEntity.ok(filmDto);
+    public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) throws FilmNotFound {
+        return ResponseEntity.ok(filmDbStorage.updateFilm(film));
     }
 
     /**
@@ -80,7 +70,10 @@ public class FilmController {
      * Получаем Film по популярности(количеству like)
      */
     @GetMapping("/popular")
-    public ResponseEntity<List<Film>> getPopularFilms(@RequestParam(defaultValue = "0") int count) {
-        return ResponseEntity.ok(filmService.getPopularFilms(count));
+//    public ResponseEntity<List<Film>> getPopularFilms(@RequestParam(defaultValue = "0") int count) {
+//        return ResponseEntity.ok(filmDbStorage.getPopularFilms(count));
+        public ResponseEntity<List<Film>> getPopularFilms() {
+        return ResponseEntity.ok(filmDbStorage.getPopularFilms());
     }
+
 }

@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.repository;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.FilmNotFound;
@@ -22,14 +22,18 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User addUser(User user) {
-        String sql = "INSERT INTO USERS VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO USERS (email, login, name, birthday) VALUES (?, ?, ?, ?)";
+        String sqlId = "SELECT MAX(ID) FROM USERS";
+        if (user.getName().equals("")) {
+            user.setName(user.getLogin());
+        }
         jdbcTemplate.update(sql,
-                user.getId(),
                 user.getEmail(),
                 user.getLogin(),
                 user.getName(),
                 user.getBirthday()
-                );
+        );
+        user.setId(jdbcTemplate.queryForObject(sqlId, Long.class));
         return user;
     }
 
@@ -41,30 +45,35 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User getUserById(long id) throws UserNotFound {
-        String sql = "SELECT * FROM USERS WHERE ID = ?";
-        String sqlFriends = "SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ? AND STATUS IS TRUE)";
-        User user = jdbcTemplate.queryForObject(sql, new UserRowMapper(), id);
-        List<User> userFriends = jdbcTemplate.query(sqlFriends, new UserRowMapper(), id);
-        user.setFriends(userFriends);
-        return user;
+        try {
+            String sql = "SELECT * FROM USERS WHERE ID = ?";
+            String sqlFriends = "SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ? AND STATUS IS TRUE)";
+            User user = jdbcTemplate.queryForObject(sql, new UserRowMapper(), id);
+            List<User> userFriends = jdbcTemplate.query(sqlFriends, new UserRowMapper(), id);
+            user.setFriends(userFriends);
+            return user;
+        } catch (EmptyResultDataAccessException e) {
+            throw new UserNotFound("");
+        }
     }
 
     @Override
     public User updateUser(User user) throws UserNotFound {
-        String sql = "UPDATE USERS SET " +
-                "EMAIL = ?, " +
-                "LOGIN = ?, " +
-                "NAME = ?, " +
-                "BIRTHDAY = ? " +
-                "WHERE ID = ?";
-        jdbcTemplate.update(sql,
-                user.getEmail(),
-                user.getLogin(),
-                user.getName(),
-                user.getBirthday(),
-                user.getId()
-        );
-        return user;
+            getUserById(user.getId());
+            String sql = "UPDATE USERS SET " +
+                    "EMAIL = ?, " +
+                    "LOGIN = ?, " +
+                    "NAME = ?, " +
+                    "BIRTHDAY = ? " +
+                    "WHERE ID = ?";
+            jdbcTemplate.update(sql,
+                    user.getEmail(),
+                    user.getLogin(),
+                    user.getName(),
+                    user.getBirthday(),
+                    user.getId()
+            );
+            return user;
     }
 
     @Override
@@ -74,16 +83,10 @@ public class UserDbStorage implements UserStorage {
     }
 
     public void addFriend(long userId, long friendId) throws UserNotFound {
-        String sqlForNull = "SELECT COUNT(*) FROM FRIENDS WHERE USER_ID = ? AND FRIEND_ID = ?";
-        if (jdbcTemplate.queryForObject(sqlForNull, Integer.class, userId, friendId) > 0) {
-            String sqlTrue = "UPDATE FRIENDS SET STATUS = TRUE WHERE USER_ID = ? AND FRIEND_ID = ?";
-            jdbcTemplate.update(sqlTrue, userId, friendId);
-        } else {
-            String sql = "INSERT INTO FRIENDS VALUES (?, ?, ?)";
-            jdbcTemplate.update(sql, userId, friendId, Boolean.TRUE);
-            jdbcTemplate.update(sql, friendId, userId, Boolean.FALSE);
-        }
-
+        getUserById(userId);
+        getUserById(friendId);
+        String sql = "INSERT INTO FRIENDS (USER_ID, FRIEND_ID, STATUS) VALUES (?, ?, ?)";
+        jdbcTemplate.update(sql, userId, friendId, Boolean.TRUE);
     }
 
     public void deleteFriend(long friendId, long userId) throws UserNotFound {
@@ -104,8 +107,8 @@ public class UserDbStorage implements UserStorage {
     }
 
     public void addLike(long userId, long filmId) throws UserNotFound, FilmNotFound {
-        String sql = "INSERT INTO LIKES VALUES (?, ?)";
-        jdbcTemplate.update(sql, filmId, userId);
+        String sql = "MERGE INTO LIKES (USER_ID, FILM_ID) KEY (USER_ID) VALUES ( ?, ? )";
+        jdbcTemplate.update(sql, userId, filmId);
     }
 
     public void deleteLikeFromFilm(long filmId, long userId) throws FilmNotFound, UserNotFound {

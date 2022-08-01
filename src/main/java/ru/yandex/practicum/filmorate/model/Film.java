@@ -10,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -20,7 +21,8 @@ public class Film {
     @NotBlank
     @NotNull
     private String name;
-    private Genre genre;
+    private List<Genre> genres;
+    @NotNull
     private Mpa mpa;
     @Size(max = 200, message = "не может быть больше 200")
     private String description;

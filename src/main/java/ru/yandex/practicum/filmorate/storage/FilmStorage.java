@@ -8,13 +8,13 @@ import java.util.List;
 
 public interface FilmStorage {
 
-    FilmDto addFilm(FilmDto filmDto);
+    Film addFilm(Film Film);
 
     List<Film> getAllFilms();
 
     Film getFilmById(long id) throws FilmNotFound;
 
-    FilmDto updateFilm(FilmDto filmDto) throws FilmNotFound;
+    Film updateFilm(Film film) throws FilmNotFound;
 
     void deleteFilm(long filmId) throws FilmNotFound;
 }
