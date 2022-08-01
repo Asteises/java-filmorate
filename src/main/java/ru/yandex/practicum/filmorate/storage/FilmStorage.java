@@ -14,7 +14,7 @@ public interface FilmStorage {
 
     Film getFilmById(long id) throws FilmNotFound;
 
-    Film updateFilm(Film film) throws FilmNotFound;
+    FilmDto updateFilm(FilmDto filmDto) throws FilmNotFound;
 
     void deleteFilm(long filmId) throws FilmNotFound;
 }

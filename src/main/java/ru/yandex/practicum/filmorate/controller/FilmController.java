@@ -33,46 +33,52 @@ public class FilmController {
 
     private final FilmDbStorage filmDbStorage;
 
+    /**
+     * Добавляем новый Film
+     */
     @PostMapping
     public FilmDto addFilm(@Valid @RequestBody FilmDto filmDto) {
         filmDbStorage.addFilm(filmDto);
         return filmDto;
     }
 
+    /**
+     * Получаем всех Film
+     */
     @GetMapping
     public ResponseEntity<List<Film>> getAllFilms() {
-        return new ResponseEntity<>(filmService.getAllFilms(), HttpStatus.OK);
+        return new ResponseEntity<>(filmDbStorage.getAllFilms(), HttpStatus.OK);
     }
 
+    /**
+     * Получаем Film по id
+     */
     @GetMapping("/{id}")
     public ResponseEntity<Film> getFilmById(@PathVariable long id) throws FilmNotFound {
         return new ResponseEntity<>(filmDbStorage.getFilmById(id), HttpStatus.OK);
     }
 
+    /**
+     * Изменяем существующий Film
+     */
     @PutMapping
-    public Film updateFilm(@Valid @RequestBody Film film) throws FilmNotFound {
-        filmService.updateFilm(film);
-        return film;
+    public ResponseEntity<FilmDto> updateFilm(@Valid @RequestBody FilmDto filmDto) throws FilmNotFound {
+        filmDbStorage.updateFilm(filmDto);
+        return ResponseEntity.ok(filmDto);
     }
 
+    /**
+     * Удаляем Film по id
+     */
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteFilm(@PathVariable long id) throws FilmNotFound {
-        filmService.deleteFilm(id);
+        filmDbStorage.deleteFilm(id);
         return ResponseEntity.ok("Film delete");
     }
 
-    @PutMapping("{id}/like/{userId}")
-    public ResponseEntity<String> addLikeToFilm(@PathVariable long id, @PathVariable long userId) throws UserNotFound, FilmNotFound {
-        filmService.addLikeToFilm(id, userId);
-        return ResponseEntity.ok("Like add");
-    }
-
-    @DeleteMapping("/{id}/like/{userId}")
-    public ResponseEntity<String> deleteLikeFromFilm(@PathVariable long id, @PathVariable long userId) throws UserNotFound, FilmNotFound {
-        filmService.deleteLikeFromFilm(id, userId);
-        return ResponseEntity.ok("Like delete");
-    }
-
+    /**
+     * Получаем Film по популярности(количеству like)
+     */
     @GetMapping("/popular")
     public ResponseEntity<List<Film>> getPopularFilms(@RequestParam(defaultValue = "0") int count) {
         return ResponseEntity.ok(filmService.getPopularFilms(count));

@@ -40,7 +40,7 @@ public class FilmService {
     }
 
     public void updateFilm(Film film) throws FilmNotFound {
-        filmStorage.updateFilm(film);
+//        filmStorage.updateFilm(film);
     }
 
     public void deleteFilm(long filmId) throws FilmNotFound {

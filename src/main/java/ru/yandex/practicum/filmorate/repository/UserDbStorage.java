@@ -107,4 +107,9 @@ public class UserDbStorage implements UserStorage {
         String sql = "INSERT INTO LIKES VALUES (?, ?)";
         jdbcTemplate.update(sql, filmId, userId);
     }
+
+    public void deleteLikeFromFilm(long filmId, long userId) throws FilmNotFound, UserNotFound {
+        String sql = "DELETE FROM LIKES WHERE FILM_ID = ? AND USER_ID = ?";
+        jdbcTemplate.update(sql, filmId, userId);
+    }
 }

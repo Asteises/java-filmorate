@@ -19,6 +19,7 @@ public class FilmDbStorage implements FilmStorage {
     private final GenreDbStorage genreDbStorage;
     private final MpaDbStorage mpaDbStorage;
     private final LikesDbStorage likesDbStorage;
+
     @Override
     public FilmDto addFilm(FilmDto filmDto) {
         String sql = "INSERT INTO FILMS VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -36,7 +37,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getAllFilms() {
-        return null;
+        String sql = "SELECT * FROM FILMS";
+        return jdbcTemplate.query(sql, new FilmRowMapper(genreDbStorage, mpaDbStorage, likesDbStorage));
     }
 
     @Override
@@ -46,12 +48,30 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film updateFilm(Film film) throws FilmNotFound {
-        return null;
+    public FilmDto updateFilm(FilmDto filmDto) throws FilmNotFound {
+        String sql = "UPDATE FILMS SET " +
+                "NAME = ?, " +
+                "GENRE = ?, " +
+                "MPA = ?, " +
+                "DESCRIPTION = ?, " +
+                "RELEASEDATE = ?, " +
+                "DURATION = ? " +
+                "WHERE ID = ?";
+        jdbcTemplate.update(sql,
+                filmDto.getName(),
+                filmDto.getGenre(),
+                filmDto.getMpa(),
+                filmDto.getDescription(),
+                filmDto.getReleaseDate(),
+                filmDto.getDuration(),
+                filmDto.getId()
+        );
+        return filmDto;
     }
 
     @Override
     public void deleteFilm(long filmId) throws FilmNotFound {
-
+        String sql = "DELETE FROM FILMS WHERE ID = ?";
+        jdbcTemplate.update(sql, filmId);
     }
 }

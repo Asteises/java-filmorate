@@ -99,9 +99,21 @@ public class UserController {
         return new ResponseEntity<>(userDbStorage.getAllCommonFriends(id, friendId), HttpStatus.OK);
     }
 
+    /**
+     * Добавляем like к Film
+     */
     @PostMapping("/{userId}/like/{filmId}")
     public ResponseEntity<String> addLike(@PathVariable long userId, @PathVariable long filmId) throws UserNotFound, FilmNotFound {
         userDbStorage.addLike(userId, filmId);
         return ResponseEntity.ok("Лайк добавлен");
+    }
+
+    /**
+     * Удаляем like у Film
+     */
+    @DeleteMapping("/{id}/like/{userId}")
+    public ResponseEntity<String> deleteLikeFromFilm(@PathVariable long id, @PathVariable long userId) throws UserNotFound, FilmNotFound {
+        userDbStorage.deleteLikeFromFilm(id, userId);
+        return ResponseEntity.ok("Like delete");
     }
 }
