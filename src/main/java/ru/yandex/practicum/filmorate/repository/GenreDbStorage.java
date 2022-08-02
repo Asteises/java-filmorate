@@ -8,6 +8,8 @@ import ru.yandex.practicum.filmorate.exeption.UserNotFound;
 import ru.yandex.practicum.filmorate.mapper.GenreRowMapper;
 import ru.yandex.practicum.filmorate.model.Genre;
 
+import java.util.List;
+
 @Data
 @Repository
 @RequiredArgsConstructor
@@ -17,8 +19,12 @@ public class GenreDbStorage {
 
     public Genre getGenreById(long id) throws UserNotFound {
         String sql = "SELECT * FROM GENRE WHERE ID = ?";
-        Genre genre = jdbcTemplate.queryForObject(sql, new GenreRowMapper(), id);
-        return genre;
+        return jdbcTemplate.queryForObject(sql, new GenreRowMapper(), id);
+    }
+
+    public List<Genre> getAllGenres() {
+        String sql = "SELECT * FROM GENRE";
+        return jdbcTemplate.query(sql, new GenreRowMapper());
     }
 
 }

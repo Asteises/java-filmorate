@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeption.FilmNotFound;
 import ru.yandex.practicum.filmorate.exeption.UserNotFound;
-import ru.yandex.practicum.filmorate.repository.UserDbStorage;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -20,14 +19,13 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
-    private final UserDbStorage userDbStorage;
 
     /**
      * Добавляем нового User
      */
     @PostMapping
     public User addUser(@Valid @RequestBody User user) {
-        userDbStorage.addUser(user);
+        userService.addUser(user);
         return user;
     }
 
@@ -36,15 +34,15 @@ public class UserController {
      */
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
-        return new ResponseEntity<>(userDbStorage.getAllUsers(), HttpStatus.OK);
+        return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
     /**
      * Получаем User по id
      */
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable String id) throws UserNotFound {
-        return new ResponseEntity<>(userDbStorage.getUserById(Long.parseLong(id)), HttpStatus.OK);
+    public ResponseEntity<User> getUserById(@PathVariable long id) throws UserNotFound {
+        return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
     }
 
     /**
@@ -52,7 +50,7 @@ public class UserController {
      */
     @PutMapping
     public ResponseEntity<User> updateUser(@Valid @RequestBody User user) throws UserNotFound {
-        userDbStorage.updateUser(user);
+        userService.updateUser(user);
         return ResponseEntity.ok(user);
     }
 
@@ -61,7 +59,7 @@ public class UserController {
      */
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable long id) throws UserNotFound {
-        userDbStorage.deleteUser(id);
+        userService.deleteUser(id);
         return ResponseEntity.ok("");
     }
 
@@ -70,8 +68,8 @@ public class UserController {
      */
     @PutMapping("/{id}/friends/{friendId}")
     public ResponseEntity<User> addFriend(@PathVariable long id, @PathVariable long friendId) throws UserNotFound {
-        userDbStorage.addFriend(id, friendId);
-        return ResponseEntity.ok(userDbStorage.getUserById(id));
+        userService.addFriend(id, friendId);
+        return ResponseEntity.ok(userService.getUserById(id));
     }
 
     /**
@@ -79,7 +77,7 @@ public class UserController {
      */
     @DeleteMapping("/{id}/friends/{friendId}")
     public ResponseEntity<String> deleteFriend(@PathVariable long id, @PathVariable long friendId) throws UserNotFound {
-        userDbStorage.deleteFriend(friendId, id);
+        userService.deleteFriend(friendId, id);
         return ResponseEntity.ok("Friend has been deleted");
     }
 
@@ -88,15 +86,15 @@ public class UserController {
      */
     @GetMapping("/{id}/friends")
     public ResponseEntity<List<User>> getAllFriends(@PathVariable long id) throws UserNotFound {
-        return new ResponseEntity<>(userDbStorage.getAllFriends(id), HttpStatus.OK);
+        return new ResponseEntity<>(userService.getAllFriends(id), HttpStatus.OK);
     }
 
     /**
      * Получаем всех общих друзей двух User
      */
-    @GetMapping("/{id}/friends/common/{friendId}")
-    public ResponseEntity<List<User>> getAllCommonFriends(@PathVariable long id, @PathVariable long friendId) throws UserNotFound {
-        return new ResponseEntity<>(userDbStorage.getAllCommonFriends(id, friendId), HttpStatus.OK);
+    @GetMapping("/{userId}/friends/common/{friendId}")
+    public ResponseEntity<List<User>> getAllCommonFriends(@PathVariable long userId, @PathVariable long friendId) throws UserNotFound {
+        return new ResponseEntity<>(userService.getAllCommonFriends(userId, friendId), HttpStatus.OK);
     }
 
     /**
@@ -104,16 +102,16 @@ public class UserController {
      */
     @PostMapping("/{userId}/like/{filmId}")
     public ResponseEntity<String> addLike(@PathVariable long userId, @PathVariable long filmId) throws UserNotFound, FilmNotFound {
-        userDbStorage.addLike(userId, filmId);
+        userService.addLikeToFilm(userId, filmId);
         return ResponseEntity.ok("Лайк добавлен");
     }
 
     /**
      * Удаляем like у Film
      */
-    @DeleteMapping("/{id}/like/{userId}")
-    public ResponseEntity<String> deleteLikeFromFilm(@PathVariable long id, @PathVariable long userId) throws UserNotFound, FilmNotFound {
-        userDbStorage.deleteLikeFromFilm(id, userId);
+    @DeleteMapping("/{userId}/like/delete/{filmId}")
+    public ResponseEntity<String> deleteLikeFromFilm(@PathVariable long userId, @PathVariable long filmId) throws UserNotFound, FilmNotFound {
+        userService.deleteLikeFromFilm(userId, filmId);
         return ResponseEntity.ok("Like delete");
     }
 }

@@ -2,9 +2,11 @@ package ru.yandex.practicum.filmorate.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.exeption.FilmNotFound;
 import ru.yandex.practicum.filmorate.mapper.FilmRowMapper;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -23,35 +25,44 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film addFilm(Film film) {
-        String sql = "INSERT INTO FILMS (NAME, GENRE, MPA, DESCRIPTION, RELEASEDATE, DURATION) VALUES (?, ?, ?, ?, ?, ?)";
-        String sqlId = "SELECT MAX(ID) FROM FILMS";
+        String sql = "INSERT INTO FILMS (" +
+                "ID, " +
+                "NAME, " +
+                "GENRE," +
+                "MPA, " +
+                "DESCRIPTION, " +
+                "RELEASEDATE, " +
+                "DURATION) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(sql,
+                keyHolder.getKey(),
                 film.getName(),
-                film.getGenre() != null ? film.getGenre().getId() : null,
-                film.getMpa().getId(),
+                film.getGenres().stream().map(film::getGenres).collect(Collectors.toList()),
+                film.getMpa(),
                 film.getDescription(),
                 film.getReleaseDate(),
                 film.getDuration()
         );
-        film.setId(jdbcTemplate.queryForObject(sqlId, Long.class));
         return film;
     }
 
     @Override
     public List<Film> getAllFilms() {
-        String sql = "SELECT * FROM FILMS";
-        return jdbcTemplate.query(sql, new FilmRowMapper(genreDbStorage, mpaDbStorage, likesDbStorage));
+        String sql = "SELECT * FROM FILMS JOIN MPA ON MPA.ID = FILM.MPAID";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Film.class));
     }
 
     @Override
     public Film getFilmById(long id) throws FilmNotFound {
         try {
-            String sql = "SELECT * FROM FILMS WHERE ID = ?";
+            String sql = "SELECT * FROM (SELECT * FROM FILMS JOIN MPA ON MPA.ID = FILMS.MPAID) AS F WHERE F.ID = ?";
             return jdbcTemplate.queryForObject(sql, new FilmRowMapper(genreDbStorage, mpaDbStorage, likesDbStorage), id);
         } catch (EmptyResultDataAccessException e) {
             throw new FilmNotFound("");
         }
     }
+
 
     @Override
     public Film updateFilm(Film film) throws FilmNotFound {
@@ -67,7 +78,7 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sql,
                 film.getName(),
                 film.getGenre() != null ? film.getGenre().getId() : null,
-                film.getMpa().getId(),
+                film.getMpa(),
                 film.getDescription(),
                 film.getReleaseDate(),
                 film.getDuration(),

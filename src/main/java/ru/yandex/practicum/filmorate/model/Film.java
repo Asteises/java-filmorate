@@ -10,7 +10,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -21,9 +22,9 @@ public class Film {
     @NotBlank
     @NotNull
     private String name;
-    private List<Genre> genres;
+    private Set<FilmsGenres> genres = new HashSet<>();
     @NotNull
-    private Mpa mpa;
+    private int mpa;
     @Size(max = 200, message = "не может быть больше 200")
     private String description;
     @DateAfter

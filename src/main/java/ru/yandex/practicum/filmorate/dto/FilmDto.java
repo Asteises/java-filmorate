@@ -1,10 +1,7 @@
 package ru.yandex.practicum.filmorate.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.utils.DateAfter;
 
 import javax.validation.constraints.Min;

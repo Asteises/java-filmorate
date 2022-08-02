@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
@@ -11,7 +10,7 @@ public class MpaRowMapper implements RowMapper<Mpa> {
     @Override
     public Mpa mapRow(ResultSet rs, int rowNum) throws SQLException {
         Mpa mpa = new Mpa();
-        mpa.setId(rs.getLong("ID"));
+        mpa.setId(rs.getInt("ID"));
         mpa.setName(rs.getString("NAME"));
         return mpa;
     }

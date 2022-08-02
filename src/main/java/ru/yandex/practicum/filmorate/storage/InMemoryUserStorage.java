@@ -69,4 +69,5 @@ public class InMemoryUserStorage implements UserStorage {
         log.info("User not found: {}", userId);
         throw new UserNotFound("User не найден");
     }
+
 }

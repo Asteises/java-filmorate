@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.exeption.FilmNotFound;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -27,7 +26,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film addFilm(Film film) {
         film.setId(id++);
-//        films.put(film.getId(), film);
+        films.put(film.getId(), film);
         log.info("Film has been created: {}", film);
         return film;
     }
@@ -38,24 +37,22 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     public Film getFilmById(long filmId) throws FilmNotFound {
-//        if (films.containsKey(filmId)) {
-//            return films.get(filmId);
-//        }
-//        log.info("Film not found: {}", filmId);
-//        throw new FilmNotFound("Film не найден");
-        return null;
+        if (films.containsKey(filmId)) {
+            return films.get(filmId);
+        }
+        log.info("Film not found: {}", filmId);
+        throw new FilmNotFound("Film не найден");
     }
 
     @Override
     public Film updateFilm(Film film) throws FilmNotFound {
-//        if (films.containsKey(film.getId())) {
-//            films.put(film.getId(), film);
-//            log.info("Film has been updated: {}", film);
-//            return film;
-//        }
-//        log.info("Film not found: {}", film.getId());
-//        throw new FilmNotFound("Film не найден");
-        return null;
+        if (films.containsKey(film.getId())) {
+            films.put(film.getId(), film);
+            log.info("Film has been updated: {}", film);
+            return film;
+        }
+        log.info("Film not found: {}", film.getId());
+        throw new FilmNotFound("Film не найден");
     }
 
     @Override

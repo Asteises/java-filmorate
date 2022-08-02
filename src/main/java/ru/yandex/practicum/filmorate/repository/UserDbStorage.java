@@ -89,9 +89,9 @@ public class UserDbStorage implements UserStorage {
         jdbcTemplate.update(sql, userId, friendId, Boolean.TRUE);
     }
 
-    public void deleteFriend(long friendId, long userId) throws UserNotFound {
+    public void deleteFriend(long userId, long friendId) throws UserNotFound {
         String sql = "UPDATE FRIENDS SET STATUS = 0 WHERE FRIEND_ID = ? AND USER_ID = ?";
-        jdbcTemplate.update(sql, friendId, userId);
+        jdbcTemplate.update(sql, userId, friendId);
     }
 
     public List<User> getAllFriends(long id) throws UserNotFound {
@@ -99,11 +99,10 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.query(sqlFriend, new UserRowMapper(), id);
     }
 
-    public List<User> getAllCommonFriends(long friendId, long userId) throws UserNotFound {
+    public List<User> getAllCommonFriends(long userId, long otherUserId) throws UserNotFound {
         String sqlFriend = "SELECT * FROM (SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ? AND STATUS IS TRUE)) t1 " +
                 "JOIN (SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ? AND STATUS IS TRUE)) t2 ON t2.ID=t1.ID";
-        List<User> commonFriends = jdbcTemplate.query(sqlFriend, new UserRowMapper(), userId, friendId);
-        return commonFriends;
+        return jdbcTemplate.query(sqlFriend, new UserRowMapper(), userId, otherUserId);
     }
 
     public void addLike(long userId, long filmId) throws UserNotFound, FilmNotFound {
