@@ -1,39 +1,59 @@
 package ru.yandex.practicum.filmorate.repository;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exeption.FilmNotFound;
 import ru.yandex.practicum.filmorate.exeption.UserNotFound;
 import ru.yandex.practicum.filmorate.mapper.UserRowMapper;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.sql.*;
+import java.time.LocalDate;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Repository
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
+//    private User makeUser(ResultSet rs, int rowNum) throws SQLException {
+//        return new User(rs.getLong("USER_ID"),
+//        rs.getString("EMAIL"),
+//        rs.getString("LOGIN"),
+//        rs.getString("NAME"),
+//        rs.getDate("BIRTHDAY").toLocalDate());
+//        }
+
     @Override
     public User addUser(User user) {
-        String sql = "INSERT INTO USERS (email, login, name, birthday) VALUES (?, ?, ?, ?)";
-        String sqlId = "SELECT MAX(ID) FROM USERS";
+        String sql = "INSERT INTO USERS (EMAIL, LOGIN, NAME, BIRTHDAY) VALUES (?, ?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
         if (user.getName().equals("")) {
             user.setName(user.getLogin());
         }
-        jdbcTemplate.update(sql,
-                user.getEmail(),
-                user.getLogin(),
-                user.getName(),
-                user.getBirthday()
-        );
-        user.setId(jdbcTemplate.queryForObject(sqlId, Long.class));
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql, new String[] {"ID"});
+            ps.setString(1, user.getEmail());
+            ps.setString(2, user.getLogin());
+            ps.setString(3, user.getName());
+            LocalDate birthday = user.getBirthday();
+            if (birthday == null) {
+                ps.setNull(4, Types.DATE);
+            } else {
+                ps.setDate(4, Date.valueOf(birthday));
+            }
+            return ps;
+        }, keyHolder);
+        user.setId(keyHolder.getKey().longValue());
         return user;
     }
 
@@ -82,36 +102,4 @@ public class UserDbStorage implements UserStorage {
         jdbcTemplate.update(sql, id);
     }
 
-    public void addFriend(long userId, long friendId) throws UserNotFound {
-        getUserById(userId);
-        getUserById(friendId);
-        String sql = "INSERT INTO FRIENDS (USER_ID, FRIEND_ID, STATUS) VALUES (?, ?, ?)";
-        jdbcTemplate.update(sql, userId, friendId, Boolean.TRUE);
-    }
-
-    public void deleteFriend(long userId, long friendId) throws UserNotFound {
-        String sql = "UPDATE FRIENDS SET STATUS = 0 WHERE FRIEND_ID = ? AND USER_ID = ?";
-        jdbcTemplate.update(sql, userId, friendId);
-    }
-
-    public List<User> getAllFriends(long id) throws UserNotFound {
-        String sqlFriend = "SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ? AND STATUS IS TRUE)";
-        return jdbcTemplate.query(sqlFriend, new UserRowMapper(), id);
-    }
-
-    public List<User> getAllCommonFriends(long userId, long otherUserId) throws UserNotFound {
-        String sqlFriend = "SELECT * FROM (SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ? AND STATUS IS TRUE)) t1 " +
-                "JOIN (SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ? AND STATUS IS TRUE)) t2 ON t2.ID=t1.ID";
-        return jdbcTemplate.query(sqlFriend, new UserRowMapper(), userId, otherUserId);
-    }
-
-    public void addLike(long userId, long filmId) throws UserNotFound, FilmNotFound {
-        String sql = "MERGE INTO LIKES (USER_ID, FILM_ID) KEY (USER_ID) VALUES ( ?, ? )";
-        jdbcTemplate.update(sql, userId, filmId);
-    }
-
-    public void deleteLikeFromFilm(long filmId, long userId) throws FilmNotFound, UserNotFound {
-        String sql = "DELETE FROM LIKES WHERE FILM_ID = ? AND USER_ID = ?";
-        jdbcTemplate.update(sql, filmId, userId);
-    }
 }

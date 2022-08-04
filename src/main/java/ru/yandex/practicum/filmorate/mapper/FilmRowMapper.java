@@ -2,11 +2,9 @@ package ru.yandex.practicum.filmorate.mapper;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.repository.GenreDbStorage;
 import ru.yandex.practicum.filmorate.repository.LikesDbStorage;
 import ru.yandex.practicum.filmorate.repository.MpaDbStorage;
@@ -25,19 +23,15 @@ public class FilmRowMapper implements RowMapper<Film> {
 
     @Override
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Genre genre = new Genre();
-        try {
-            genre = genreDbStorage.getGenreById(rs.getLong("GENRE"));
-        } catch (EmptyResultDataAccessException e) {}
         Film film = new Film();
         film.setId(rs.getLong("ID"));
         film.setName(rs.getString("NAME"));
-        film.setGenre(genre);
-        film.setMpa(mpaDbStorage.getMpaById(rs.getInt("MPA")));
+        film.setMpa(mpaDbStorage.getMpaById(rs.getInt("MPA_ID")));
         film.setDescription(rs.getString("DESCRIPTION"));
         film.setDuration(rs.getInt("DURATION"));
-        film.setReleaseDate(rs.getDate("RELEASEDATE").toLocalDate());
-        film.setLikes(likesDbStorage.getLikesCount(rs.getLong("ID")));
+        film.setReleaseDate(rs.getDate("RELEASE_DATE").toLocalDate());
+        film.setRate(likesDbStorage.getLikesCount(rs.getLong("ID")));
+        film.setGenres(genreDbStorage.getGenresByFilmId(film.getId()));
         return film;
     }
 }

@@ -38,29 +38,4 @@ public class UserService {
         userDbStorage.deleteUser(id);
     }
 
-    public void addFriend(long userId, long friendId) throws UserNotFound {
-        userDbStorage.addFriend(userId, friendId);
-    }
-
-    public void deleteFriend(long userId, long friendId) throws UserNotFound {
-        userDbStorage.deleteFriend(friendId, userId);
-    }
-
-    public List<User> getAllFriends(long userId) throws UserNotFound {
-        return userDbStorage.getAllFriends(userId);
-    }
-
-    public List<User> getAllCommonFriends(long userId, long otherUserId) throws UserNotFound {
-        return userDbStorage.getAllCommonFriends(userId, otherUserId);
-    }
-
-    public void addLikeToFilm(long filmId, long userId) throws UserNotFound, FilmNotFound {
-        userDbStorage.addLike(filmId, userId);
-        log.info("Like has been add");
-    }
-
-    public void deleteLikeFromFilm(long userId, long filmId) throws UserNotFound, FilmNotFound {
-        userDbStorage.deleteLikeFromFilm(userId, filmId);
-        log.info("Like deleted");
-    }
 }

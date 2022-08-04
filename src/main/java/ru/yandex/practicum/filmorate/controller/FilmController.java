@@ -6,8 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeption.FilmNotFound;
+import ru.yandex.practicum.filmorate.exeption.UserNotFound;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.LikesService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -19,12 +22,13 @@ import java.util.List;
 public class FilmController {
 
     private final FilmService filmService;
+    private final LikesService likesService;
 
     /**
      * Добавляем новый Film
      */
     @PostMapping
-    public Film addFilm(@Valid @RequestBody Film film) {
+    public Film addFilm(@Valid @RequestBody Film film) throws FilmNotFound {
         filmService.addFilm(film);
         return film;
     }
@@ -67,7 +71,42 @@ public class FilmController {
      */
     @GetMapping("/popular")
     public ResponseEntity<List<Film>> getPopularFilms(@RequestParam(defaultValue = "0") int count) {
-        return ResponseEntity.ok(filmService.getPopularFilms());
+        return ResponseEntity.ok(filmService.getPopularFilms(count));
+    }
+
+    /**
+     * Добавляем Genre в Film
+     */
+    @PostMapping("{id}/genres/set/")
+    public ResponseEntity<String> setGenres(@PathVariable long id, @RequestBody List<Genre> genres) throws FilmNotFound {
+        filmService.setFilmGenres(id, genres);
+        return ResponseEntity.ok("Genres успешно добавлены");
+    }
+
+    /**
+     * Получаем все Genre у Film
+     */
+    @GetMapping("{id}/genres/")
+    public ResponseEntity<List<Genre>> getFilmGenres(@PathVariable long id) throws FilmNotFound {
+        return ResponseEntity.ok(filmService.getFilmGenres(id));
+    }
+
+    /**
+     * Добавляем like к Film
+     */
+    @PutMapping("/{userId}/like/{filmId}")
+    public ResponseEntity<String> addLike(@PathVariable long userId, @PathVariable long filmId) throws UserNotFound, FilmNotFound {
+        likesService.addLikeToFilm(userId, filmId);
+        return ResponseEntity.ok("Лайк добавлен");
+    }
+
+    /**
+     * Удаляем like у Film
+     */
+    @DeleteMapping("/{userId}/like/{filmId}")
+    public ResponseEntity<String> deleteLikeFromFilm(@PathVariable long userId, @PathVariable long filmId) throws UserNotFound, FilmNotFound {
+        likesService.deleteLikeFromFilm(userId, filmId);
+        return ResponseEntity.ok("Like delete");
     }
 
 }
