@@ -54,6 +54,23 @@ class UserDbStorageTest {
         Assertions.assertTrue(actualUsers.containsAll(expectedUsers));
     }
 
+    @Test
+    public void testUpdateUser() {
+        User user = getTestUser();
+        userStorage.addUser(user);
+        User actualUser = userStorage.getUserById(1);
+        userStorage.updateUser(user);
+        Assertions.assertEquals(user, actualUser);
+    }
+
+    @Test
+    public void testDeleteUser() {
+        User user = getTestUser();
+        userStorage.addUser(user);
+        userStorage.deleteUser(user.getId());
+        Assertions.assertEquals(0, userStorage.getAllUsers().size());
+    }
+
     private User getTestUser() {
         User user = new User();
         user.setName("TestName");
