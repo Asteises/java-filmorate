@@ -103,9 +103,9 @@ public class FilmController {
     /**
      * Удаляем like у Film
      */
-    @DeleteMapping("/{userId}/like/{filmId}")
-    public ResponseEntity<String> deleteLikeFromFilm(@PathVariable long userId, @PathVariable long filmId) throws UserNotFound, FilmNotFound {
-        likesService.deleteLikeFromFilm(userId, filmId);
+    @DeleteMapping("/{filmId}/like/{userId}")
+    public ResponseEntity<String> deleteLikeFromFilm(@PathVariable long filmId, @PathVariable long userId) throws UserNotFound, FilmNotFound {
+        likesService.deleteLikeFromFilm(filmId, userId);
         return ResponseEntity.ok("Like delete");
     }
 

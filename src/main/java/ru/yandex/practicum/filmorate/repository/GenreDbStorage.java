@@ -2,9 +2,11 @@ package ru.yandex.practicum.filmorate.repository;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exeption.GenreNotFound;
 import ru.yandex.practicum.filmorate.exeption.UserNotFound;
 import ru.yandex.practicum.filmorate.mapper.GenreRowMapper;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -19,9 +21,13 @@ public class GenreDbStorage {
 
     public final JdbcTemplate jdbcTemplate;
 
-    public Genre getGenreById(long id) throws UserNotFound {
-        String sql = "SELECT * FROM GENRE WHERE ID = ?";
-        return jdbcTemplate.queryForObject(sql, new GenreRowMapper(), id);
+    public Genre getGenreById(long id) throws GenreNotFound {
+        try {
+            String sql = "SELECT * FROM GENRE WHERE ID = ?";
+            return jdbcTemplate.queryForObject(sql, new GenreRowMapper(), id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new GenreNotFound("");
+        }
     }
 
     public List<Genre> getAllGenres() {
@@ -30,7 +36,7 @@ public class GenreDbStorage {
     }
 
     public List<Genre> getGenresByFilmId(long id) {
-        String sql = "SELECT * FROM GENRE WHERE ID IN (SELECT genre_id FROM FILMS_GENRES WHERE FILM_ID = ?)";
+        String sql = "SELECT * FROM GENRE WHERE ID IN (SELECT GENRE_ID FROM FILMS_GENRES WHERE FILM_ID = ?)";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Genre.class), id);
     }
 

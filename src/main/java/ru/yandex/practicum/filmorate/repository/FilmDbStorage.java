@@ -18,6 +18,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Types;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -78,6 +79,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) throws FilmNotFound {
+        film.setGenres(film.getGenres().stream().distinct().collect(Collectors.toList()));
         getFilmById(film.getId());
         String sql = "UPDATE FILMS SET " +
                 "NAME = ?, " +
@@ -94,6 +96,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.getDuration(),
                 film.getId()
         );
+        setFilmGenre(film.getId(), film.getGenres());
         return film;
     }
 
@@ -104,12 +107,13 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     public List<Film> getPopularFilms(int count) {
-        String sqll = "SELECT *, COUNT(*) as total FROM FILMS f LEFT JOIN LIKES l on f.id = l.film_id GROUP BY f.id ORDER BY total DESC";
-        if (count == 0) {
+        String sqll = "SELECT *, COUNT(*) as total FROM FILMS f LEFT JOIN LIKES l on f.id = l.film_id GROUP BY f.id";
+        if (count != 0) {
             return jdbcTemplate.query(sqll, new FilmRowMapper(genreDbStorage, mpaDbStorage, likesDbStorage))
-                    .stream().limit(count).collect(Collectors.toList());
+                    .stream().sorted(Comparator.comparing(Film::getRate)).limit(count).collect(Collectors.toList());
         } else {
-            return jdbcTemplate.query(sqll, new FilmRowMapper(genreDbStorage, mpaDbStorage, likesDbStorage));
+            return jdbcTemplate.query(sqll, new FilmRowMapper(genreDbStorage, mpaDbStorage, likesDbStorage)).stream()
+                    .sorted(Comparator.comparing(Film::getRate)).collect(Collectors.toList());
         }
     }
 

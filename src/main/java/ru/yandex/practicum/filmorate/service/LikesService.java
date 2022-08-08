@@ -13,14 +13,16 @@ import ru.yandex.practicum.filmorate.repository.LikesDbStorage;
 public class LikesService {
 
     private final LikesDbStorage likesDbStorage;
+    private final UserService userService;
 
     public void addLikeToFilm(long filmId, long userId) throws UserNotFound, FilmNotFound {
         likesDbStorage.addLike(filmId, userId);
         log.info("Like has been add");
     }
 
-    public void deleteLikeFromFilm(long userId, long filmId) throws UserNotFound, FilmNotFound {
-        likesDbStorage.deleteLikeFromFilm(userId, filmId);
+    public void deleteLikeFromFilm(long filmId, long userId) throws UserNotFound, FilmNotFound {
+        userService.getUserById(userId);
+        likesDbStorage.deleteLikeFromFilm(filmId, userId);
         log.info("Like deleted");
     }
 

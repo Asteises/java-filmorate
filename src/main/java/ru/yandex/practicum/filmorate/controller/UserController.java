@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeption.UserNotFound;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FriendService;
-import ru.yandex.practicum.filmorate.service.LikesService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
