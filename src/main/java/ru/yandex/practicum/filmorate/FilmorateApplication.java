@@ -10,7 +10,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * Все запросы к БД выполняются очень медленно.
  * Для большой БД нужно добавлять индексы.
  */
-
     @SpringBootApplication
     public class FilmorateApplication {
         public static void main(String[] args) {

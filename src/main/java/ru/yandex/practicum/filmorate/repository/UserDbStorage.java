@@ -25,14 +25,6 @@ public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-//    private User makeUser(ResultSet rs, int rowNum) throws SQLException {
-//        return new User(rs.getLong("USER_ID"),
-//        rs.getString("EMAIL"),
-//        rs.getString("LOGIN"),
-//        rs.getString("NAME"),
-//        rs.getDate("BIRTHDAY").toLocalDate());
-//        }
-
     @Override
     public User addUser(User user) {
         String sql = "INSERT INTO USERS (EMAIL, LOGIN, NAME, BIRTHDAY) VALUES (?, ?, ?, ?)";

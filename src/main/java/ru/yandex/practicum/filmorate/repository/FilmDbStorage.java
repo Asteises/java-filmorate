@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -18,7 +17,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Types;
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,20 +55,22 @@ public class FilmDbStorage implements FilmStorage {
 
         }, keyHolder);
         film.setId(keyHolder.getKey().longValue());
-        setFilmGenre(film.getId(), film.getGenres());
+        setFilmGenres(film.getId(), film.getGenres());
         return film;
     }
 
     @Override
     public List<Film> getAllFilms() {
+        String sql1 = "SELECT * " +
+                "FROM FILMS JOIN MPA ON FILMS.MPA_ID=MPA.ID";
         String sql = "SELECT * FROM FILMS";
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Film.class));
+        return jdbcTemplate.query(sql1, new FilmRowMapper(genreDbStorage, mpaDbStorage, likesDbStorage));
     }
 
     @Override
     public Film getFilmById(long id) throws FilmNotFound {
         try {
-            String sql = "SELECT * FROM FILMS WHERE ID = ?";
+            String sql = "SELECT * FROM FILMS JOIN MPA ON FILMS.MPA_ID=MPA.ID WHERE FILMS.ID = ?";
             return jdbcTemplate.queryForObject(sql, new FilmRowMapper(genreDbStorage, mpaDbStorage, likesDbStorage), id);
         } catch (EmptyResultDataAccessException e) {
             throw new FilmNotFound("");
@@ -96,7 +96,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.getDuration(),
                 film.getId()
         );
-        setFilmGenre(film.getId(), film.getGenres());
+        setFilmGenres(film.getId(), film.getGenres());
         return film;
     }
 
@@ -107,17 +107,15 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     public List<Film> getPopularFilms(int count) {
-        String sqll = "SELECT *, COUNT(*) as total FROM FILMS f LEFT JOIN LIKES l on f.id = l.film_id GROUP BY f.id";
+        String sql = "SELECT TOP ? * FROM FILMS JOIN MPA ON FILMS.MPA_ID=MPA.ID LEFT JOIN LIKES l ON FILMS.ID = l.FILM_ID GROUP BY FILMS.ID ORDER BY COUNT(USER_ID) DESC";
         if (count != 0) {
-            return jdbcTemplate.query(sqll, new FilmRowMapper(genreDbStorage, mpaDbStorage, likesDbStorage))
-                    .stream().sorted(Comparator.comparing(Film::getRate)).limit(count).collect(Collectors.toList());
+            return jdbcTemplate.query(sql, new FilmRowMapper(genreDbStorage, mpaDbStorage, likesDbStorage), count);
         } else {
-            return jdbcTemplate.query(sqll, new FilmRowMapper(genreDbStorage, mpaDbStorage, likesDbStorage)).stream()
-                    .sorted(Comparator.comparing(Film::getRate)).collect(Collectors.toList());
+            return jdbcTemplate.query(sql, new FilmRowMapper(genreDbStorage, mpaDbStorage, likesDbStorage), 10);
         }
     }
 
-    public void setFilmGenre(long filmId, List<Genre> genres) throws FilmNotFound {
+    public void setFilmGenres(long filmId, List<Genre> genres) throws FilmNotFound {
         String sqlCheck = "SELECT COUNT(*) FROM FILMS_GENRES WHERE FILM_ID = ?";
         Integer check = jdbcTemplate.queryForObject(sqlCheck, Integer.class, filmId);
         if (check == 0) {

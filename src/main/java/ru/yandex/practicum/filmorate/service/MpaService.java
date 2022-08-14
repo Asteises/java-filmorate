@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.repository.MpaDbStorage;
+import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
 import java.util.List;
 
@@ -14,14 +14,14 @@ import java.util.List;
 @AllArgsConstructor
 public class MpaService {
 
-    private final MpaDbStorage mpaDbStorage;
+    private final MpaStorage mpaStorage;
 
     public Mpa getMpaById(int mpaId) {
-        return mpaDbStorage.getMpaById(mpaId);
+        return mpaStorage.getMpaById(mpaId);
     }
 
     public List<Mpa> getAllMpa() {
-        return mpaDbStorage.getAllMpa();
+        return mpaStorage.getAllMpa();
     }
 
 }

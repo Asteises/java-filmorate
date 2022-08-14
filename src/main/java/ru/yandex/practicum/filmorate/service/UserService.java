@@ -3,10 +3,9 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exeption.FilmNotFound;
 import ru.yandex.practicum.filmorate.exeption.UserNotFound;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.repository.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
 
@@ -15,27 +14,27 @@ import java.util.List;
 @AllArgsConstructor
 public class UserService {
 
-    private final UserDbStorage userDbStorage;
+    private final UserStorage userStorage;
 
     public User addUser(User user) {
-        userDbStorage.addUser(user);
+        userStorage.addUser(user);
         return user;
     }
 
     public List<User> getAllUsers() {
-        return userDbStorage.getAllUsers();
+        return userStorage.getAllUsers();
     }
 
     public User getUserById(long userId) throws UserNotFound {
-       return userDbStorage.getUserById(userId);
+       return userStorage.getUserById(userId);
     }
 
     public void updateUser(User user) throws UserNotFound {
-        userDbStorage.updateUser(user);
+        userStorage.updateUser(user);
     }
 
     public void deleteUser(long id) throws UserNotFound {
-        userDbStorage.deleteUser(id);
+        userStorage.deleteUser(id);
     }
 
 }

@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exeption.UserNotFound;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.repository.FriendDbStorage;
+import ru.yandex.practicum.filmorate.storage.FriendStorage;
 
 import java.util.List;
 
@@ -14,22 +14,22 @@ import java.util.List;
 @AllArgsConstructor
 public class FriendService {
 
-    private final FriendDbStorage friendDbStorage;
+    private final FriendStorage friendStorage;
 
     public void addFriend(long userId, long friendId) throws UserNotFound {
-        friendDbStorage.addFriend(userId, friendId);
+        friendStorage.addFriend(userId, friendId);
     }
 
     public void deleteFriend(long userId, long friendId) throws UserNotFound {
-        friendDbStorage.deleteFriend(friendId, userId);
+        friendStorage.deleteFriend(friendId, userId);
     }
 
     public List<User> getAllFriends(long userId) throws UserNotFound {
-        return friendDbStorage.getAllFriends(userId);
+        return friendStorage.getAllFriends(userId);
     }
 
     public List<User> getAllCommonFriends(long userId, long otherUserId) throws UserNotFound {
-        return friendDbStorage.getAllCommonFriends(userId, otherUserId);
+        return friendStorage.getAllCommonFriends(userId, otherUserId);
     }
 
 }

@@ -8,13 +8,14 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.MpaNotFound;
 import ru.yandex.practicum.filmorate.mapper.MpaRowMapper;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
 import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
 @Data
-public class MpaDbStorage {
+public class MpaDbStorage implements MpaStorage {
 
     public final JdbcTemplate jdbcTemplate;
 

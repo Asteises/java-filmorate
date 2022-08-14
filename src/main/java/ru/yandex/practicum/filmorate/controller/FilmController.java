@@ -94,7 +94,7 @@ public class FilmController {
     /**
      * Добавляем like к Film
      */
-    @PutMapping("/{userId}/like/{filmId}")
+    @PutMapping("/{filmId}/like/{userId}")
     public ResponseEntity<String> addLike(@PathVariable long userId, @PathVariable long filmId) throws UserNotFound, FilmNotFound {
         likesService.addLikeToFilm(userId, filmId);
         return ResponseEntity.ok("Лайк добавлен");

@@ -2,10 +2,12 @@ package ru.yandex.practicum.filmorate.dbStorageTest;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.UserDbStorage;
 
@@ -17,20 +19,27 @@ import java.util.List;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class UserDbStorageTest {
-    private final UserDbStorage userStorage;
+
+    private final UserDbStorage userDbStorage;
+    private final JdbcTemplate jdbcTemplate;
+
+    @BeforeEach
+    public void cleanup() {
+        jdbcTemplate.update("DELETE FROM USERS");
+    }
 
     @Test
     public void testAddUser() {
         User user = getTestUser();
-        User actualUser = userStorage.addUser(user);
+        User actualUser = userDbStorage.addUser(user);
         Assertions.assertEquals(user, actualUser);
     }
 
     @Test
     public void testGetUserById() {
         User user = getTestUser();
-        userStorage.addUser(user);
-        User actualUser = userStorage.getUserById(1);
+        long id = userDbStorage.addUser(user).getId();
+        User actualUser = userDbStorage.getUserById(id);
         Assertions.assertEquals(user, actualUser);
     }
 
@@ -45,11 +54,11 @@ class UserDbStorageTest {
         user.setId(3L);
         expectedUsers.add(user);
 
-        userStorage.addUser(user);
-        userStorage.addUser(user);
-        userStorage.addUser(user);
+        userDbStorage.addUser(user);
+        userDbStorage.addUser(user);
+        userDbStorage.addUser(user);
 
-        List<User> actualUsers = userStorage.getAllUsers();
+        List<User> actualUsers = userDbStorage.getAllUsers();
         Assertions.assertEquals(3, actualUsers.size());
         Assertions.assertTrue(actualUsers.containsAll(expectedUsers));
     }
@@ -57,18 +66,18 @@ class UserDbStorageTest {
     @Test
     public void testUpdateUser() {
         User user = getTestUser();
-        userStorage.addUser(user);
-        User actualUser = userStorage.getUserById(1);
-        userStorage.updateUser(user);
+        long id = userDbStorage.addUser(user).getId();
+        User actualUser = userDbStorage.getUserById(id);
+        userDbStorage.updateUser(user);
         Assertions.assertEquals(user, actualUser);
     }
 
     @Test
     public void testDeleteUser() {
         User user = getTestUser();
-        userStorage.addUser(user);
-        userStorage.deleteUser(user.getId());
-        Assertions.assertEquals(0, userStorage.getAllUsers().size());
+        userDbStorage.addUser(user);
+        userDbStorage.deleteUser(user.getId());
+        Assertions.assertEquals(0, userDbStorage.getAllUsers().size());
     }
 
     private User getTestUser() {

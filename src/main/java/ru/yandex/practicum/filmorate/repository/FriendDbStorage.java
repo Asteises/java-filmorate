@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.exeption.UserNotFound;
 import ru.yandex.practicum.filmorate.mapper.UserRowMapper;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.FriendStorage;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ import java.util.List;
 @Setter
 @Repository
 @RequiredArgsConstructor
-public class FriendDbStorage {
+public class FriendDbStorage implements FriendStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final UserService userService;
@@ -34,13 +35,13 @@ public class FriendDbStorage {
     }
 
     public List<User> getAllFriends(long id) throws UserNotFound {
-        String sqlFriend = "SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ? AND STATUS IS TRUE)";
+        String sqlFriend = "SELECT * FROM USERS LEFT JOIN FRIENDS ON USERS.ID=FRIENDS.FRIEND_ID WHERE FRIENDS.USER_ID = ?";
         return jdbcTemplate.query(sqlFriend, new UserRowMapper(), id);
     }
 
     public List<User> getAllCommonFriends(long userId, long otherUserId) throws UserNotFound {
-        String sqlFriend = "SELECT * FROM (SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ? AND STATUS IS TRUE)) t1 " +
-                "JOIN (SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ? AND STATUS IS TRUE)) t2 ON t2.ID=t1.ID";
+        String sqlFriend = "SELECT * FROM (SELECT * FROM USERS LEFT JOIN FRIENDS ON USERS.ID=FRIENDS.FRIEND_ID WHERE FRIENDS.USER_ID = ?) t1 " +
+                "JOIN (SELECT * FROM USERS LEFT JOIN FRIENDS ON USERS.ID=FRIENDS.FRIEND_ID WHERE FRIENDS.USER_ID = ?) t2 ON t2.ID=t1.ID";
         return jdbcTemplate.query(sqlFriend, new UserRowMapper(), userId, otherUserId);
     }
 

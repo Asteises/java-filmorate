@@ -7,17 +7,16 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.GenreNotFound;
-import ru.yandex.practicum.filmorate.exeption.UserNotFound;
 import ru.yandex.practicum.filmorate.mapper.GenreRowMapper;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
 import java.util.List;
 
 @Data
 @Repository
 @RequiredArgsConstructor
-public class GenreDbStorage {
+public class GenreDbStorage implements GenreStorage {
 
     public final JdbcTemplate jdbcTemplate;
 
