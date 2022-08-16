@@ -25,4 +25,7 @@ public interface FilmStorage {
     void setFilmGenres(long filmId, List<Genre> genres);
 
     List<Genre> getFilmGenres(long filmId);
+
+    List<Film> getAllFilmsByDirector(int directorId, String sortBy);
+
 }
