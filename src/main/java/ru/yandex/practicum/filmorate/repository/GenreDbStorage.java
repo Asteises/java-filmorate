@@ -35,7 +35,8 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     public List<Genre> getGenresByFilmId(long id) {
-        String sql = "SELECT * FROM GENRE WHERE ID IN (SELECT GENRE_ID FROM FILMS_GENRES WHERE FILM_ID = ?)";
+        String sql = "SELECT * FROM GENRE WHERE ID IN " +
+                "(SELECT GENRE_ID FROM FILMS_GENRES WHERE FILM_ID = ?)";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Genre.class), id);
     }
 

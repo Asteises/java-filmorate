@@ -70,7 +70,9 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film getFilmById(long id) throws FilmNotFound {
         try {
-            String sql = "SELECT * FROM FILMS JOIN MPA ON FILMS.MPA_ID=MPA.ID WHERE FILMS.ID = ?";
+            String sql = "SELECT * FROM FILMS " +
+                    "JOIN MPA ON FILMS.MPA_ID=MPA.ID " +
+                    "WHERE FILMS.ID = ?";
             return jdbcTemplate.queryForObject(sql, new FilmRowMapper(genreDbStorage, mpaDbStorage, likesDbStorage), id);
         } catch (EmptyResultDataAccessException e) {
             throw new FilmNotFound("");
@@ -107,7 +109,11 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     public List<Film> getPopularFilms(int count) {
-        String sql = "SELECT TOP ? * FROM FILMS JOIN MPA ON FILMS.MPA_ID=MPA.ID LEFT JOIN LIKES l ON FILMS.ID = l.FILM_ID GROUP BY FILMS.ID ORDER BY COUNT(USER_ID) DESC";
+        String sql = "SELECT TOP ? * FROM FILMS " +
+                "JOIN MPA ON FILMS.MPA_ID=MPA.ID " +
+                "LEFT JOIN LIKES l ON FILMS.ID = l.FILM_ID " +
+                "GROUP BY FILMS.ID " +
+                "ORDER BY COUNT(USER_ID) DESC";
         if (count != 0) {
             return jdbcTemplate.query(sql, new FilmRowMapper(genreDbStorage, mpaDbStorage, likesDbStorage), count);
         } else {

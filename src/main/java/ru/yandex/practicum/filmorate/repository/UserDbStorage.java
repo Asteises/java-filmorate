@@ -58,8 +58,13 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User getUserById(long id) throws UserNotFound {
         try {
-            String sql = "SELECT * FROM USERS WHERE ID = ?";
-            String sqlFriends = "SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ? AND STATUS IS TRUE)";
+            String sql = "SELECT * FROM USERS " +
+                    "WHERE ID = ?";
+            String sqlFriends = "SELECT * FROM USERS " +
+                    "WHERE ID IN " +
+                    "(SELECT FRIEND_ID FROM FRIENDS " +
+                    "WHERE USER_ID = ? " +
+                    "AND STATUS IS TRUE)";
             User user = jdbcTemplate.queryForObject(sql, new UserRowMapper(), id);
             List<User> userFriends = jdbcTemplate.query(sqlFriends, new UserRowMapper(), id);
             user.setFriends(userFriends);

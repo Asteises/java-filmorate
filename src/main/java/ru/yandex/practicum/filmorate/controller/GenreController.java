@@ -20,12 +20,18 @@ public class GenreController {
 
     private final GenreService genreService;
 
+    /**
+     * Получаем Genre по id
+     */
     @GetMapping("{id}")
     public ResponseEntity<Genre> getGenreById(@PathVariable int id) {
         Genre genre = genreService.getGenreById(id);
         return ResponseEntity.ok(genre);
     }
 
+    /**
+     * Получаем все Genre
+     */
     @GetMapping
     public ResponseEntity<List<Genre>> getAllGenres() {
         return ResponseEntity.ok(genreService.getAllGenres());

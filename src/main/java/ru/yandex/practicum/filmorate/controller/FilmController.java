@@ -34,7 +34,7 @@ public class FilmController {
     }
 
     /**
-     * Получаем всех Film
+     * Получаем все Film
      */
     @GetMapping
     public ResponseEntity<List<Film>> getAllFilms() {
@@ -60,9 +60,9 @@ public class FilmController {
     /**
      * Удаляем Film по id
      */
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteFilm(@PathVariable long id) throws FilmNotFound {
-        filmService.deleteFilm(id);
+    @DeleteMapping("/{filmId}")
+    public ResponseEntity<String> deleteFilm(@PathVariable long filmId) throws FilmNotFound {
+        filmService.deleteFilm(filmId);
         return ResponseEntity.ok("Film delete");
     }
 

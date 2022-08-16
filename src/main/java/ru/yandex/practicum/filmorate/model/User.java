@@ -8,8 +8,9 @@ import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@EqualsAndHashCode(of = "id")
+@RequiredArgsConstructor
+@EqualsAndHashCode(of = "id") // Объект определяется только по полю id
+@ToString
 public class User {
 
     private Long id;

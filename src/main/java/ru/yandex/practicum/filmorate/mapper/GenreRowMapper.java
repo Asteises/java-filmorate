@@ -8,6 +8,9 @@ import java.sql.SQLException;
 
 public class GenreRowMapper implements RowMapper<Genre> {
 
+    /**
+     * Получаем Genre из строки базы данных
+     */
     @Override
     public Genre mapRow(ResultSet rs, int rowNum) throws SQLException {
         Genre genre = new Genre();

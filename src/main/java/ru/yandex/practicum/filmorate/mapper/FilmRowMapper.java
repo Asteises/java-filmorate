@@ -22,6 +22,9 @@ public class FilmRowMapper implements RowMapper<Film> {
     private final MpaDbStorage mpaDbStorage;
     private final LikesDbStorage likesDbStorage;
 
+    /**
+     * Получаем Film из строки базы данных
+     */
     @Override
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
         Film film = new Film();
@@ -38,4 +41,5 @@ public class FilmRowMapper implements RowMapper<Film> {
         film.setGenres(genreDbStorage.getGenresByFilmId(film.getId()));
         return film;
     }
+
 }
