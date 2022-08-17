@@ -30,24 +30,30 @@ public class FriendDbStorage implements FriendStorage {
     }
 
     public void deleteFriend(long userId, long friendId) throws UserNotFound {
-        String sql = "DELETE FROM FRIENDS WHERE USER_ID = ? AND FRIEND_ID = ?";
-        jdbcTemplate.update(sql, userId, friendId);
+            userService.getUserById(userId);
+            userService.getUserById(friendId);
+            String sql = "DELETE FROM FRIENDS WHERE USER_ID = ? AND FRIEND_ID = ?";
+            jdbcTemplate.update(sql, userId, friendId);
+            jdbcTemplate.update(sql, friendId, userId);
     }
 
     public List<User> getAllFriends(long id) throws UserNotFound {
-        String sqlFriend = "SELECT * FROM USERS " +
-                "LEFT JOIN FRIENDS ON USERS.ID=FRIENDS.FRIEND_ID " +
-                "WHERE FRIENDS.USER_ID = ?";
-        return jdbcTemplate.query(sqlFriend, new UserRowMapper(), id);
+            userService.getUserById(id);
+            String sqlFriend = "SELECT * FROM USERS " +
+                    "LEFT JOIN FRIENDS ON USERS.ID=FRIENDS.FRIEND_ID " +
+                    "WHERE FRIENDS.USER_ID = ?";
+            return jdbcTemplate.query(sqlFriend, new UserRowMapper(), id);
     }
 
     public List<User> getAllCommonFriends(long userId, long otherUserId) throws UserNotFound {
-        String sqlFriend = "SELECT * FROM " +
-                "(SELECT * FROM USERS LEFT JOIN FRIENDS ON USERS.ID=FRIENDS.FRIEND_ID WHERE FRIENDS.USER_ID = ?) t1 " +
-                "JOIN " +
-                "(SELECT * FROM USERS LEFT JOIN FRIENDS ON USERS.ID=FRIENDS.FRIEND_ID WHERE FRIENDS.USER_ID = ?) t2 " +
-                "ON t2.ID=t1.ID";
-        return jdbcTemplate.query(sqlFriend, new UserRowMapper(), userId, otherUserId);
+            userService.getUserById(userId);
+            userService.getUserById(otherUserId);
+            String sqlFriend = "SELECT * FROM " +
+                    "(SELECT * FROM USERS LEFT JOIN FRIENDS ON USERS.ID=FRIENDS.FRIEND_ID WHERE FRIENDS.USER_ID = ?) t1 " +
+                    "JOIN " +
+                    "(SELECT * FROM USERS LEFT JOIN FRIENDS ON USERS.ID=FRIENDS.FRIEND_ID WHERE FRIENDS.USER_ID = ?) t2 " +
+                    "ON t2.ID=t1.ID";
+            return jdbcTemplate.query(sqlFriend, new UserRowMapper(), userId, otherUserId);
     }
 
 }
