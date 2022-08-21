@@ -44,7 +44,7 @@ public class FilmDbStorage implements FilmStorage {
                 "VALUES (?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, new String[] {"ID"});
+            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"ID"});
             ps.setString(1, film.getName());
             ps.setInt(2, film.getMpa().getId());
             ps.setString(3, film.getDescription());
@@ -110,15 +110,15 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void deleteFilm(long filmId) throws FilmNotFound {
-            getFilmById(filmId);
-            String sql = "DELETE FROM FILMS WHERE ID = ?";
-            String sqlDirector = "DELETE FROM FILMS_DIRECTORS WHERE FILM_ID = ?";
-            String sqlGenre = "DELETE FROM FILMS_GENRES WHERE FILM_ID = ?";
-            String sqlLike = "DELETE FROM LIKES WHERE FILM_ID = ?";
-            jdbcTemplate.update(sqlGenre, filmId);
-            jdbcTemplate.update(sqlLike, filmId);
-            jdbcTemplate.update(sqlDirector, filmId);
-            jdbcTemplate.update(sql, filmId);
+        getFilmById(filmId);
+        String sql = "DELETE FROM FILMS WHERE ID = ?";
+        String sqlDirector = "DELETE FROM FILMS_DIRECTORS WHERE FILM_ID = ?";
+        String sqlGenre = "DELETE FROM FILMS_GENRES WHERE FILM_ID = ?";
+        String sqlLike = "DELETE FROM LIKES WHERE FILM_ID = ?";
+        jdbcTemplate.update(sqlGenre, filmId);
+        jdbcTemplate.update(sqlLike, filmId);
+        jdbcTemplate.update(sqlDirector, filmId);
+        jdbcTemplate.update(sql, filmId);
     }
 
     public List<Film> getPopularFilms(int count) {
@@ -180,24 +180,20 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     public List<Film> getAllFilmsByDirector(int directorId, String sortBy) throws DirectorNotFound {
-        try {
-            directorDbStorage.getDirectorById(directorId);
-            if (sortBy.equals("year")) {
-                String sql = "SELECT * FROM FILMS " +
-                        "RIGHT JOIN (SELECT FILM_ID FROM FILMS_DIRECTORS WHERE DIRECTOR_ID = ?) FD ON FILMS.ID=FD.FILM_ID " +
-                        "JOIN MPA ON FILMS.MPA_ID=MPA.ID ORDER BY RELEASE_DATE";
-                return jdbcTemplate.query(sql, new FilmRowMapper(genreDbStorage, mpaDbStorage, likesDbStorage, directorDbStorage), directorId);
-            } else if (sortBy.equals("likes")) {
-                String sql = "SELECT * FROM FILMS " +
-                        "JOIN ((SELECT FILM_ID FROM FILMS_DIRECTORS WHERE DIRECTOR_ID = ?)) FD ON FILMS.ID=FD.FILM_ID " +
-                        "JOIN MPA ON FILMS.MPA_ID=MPA.ID " +
-                        "LEFT JOIN LIKES l ON FILMS.ID = l.FILM_ID " +
-                        "GROUP BY FILMS.ID " +
-                        "ORDER BY COUNT(USER_ID) DESC";
-                return jdbcTemplate.query(sql, new FilmRowMapper(genreDbStorage, mpaDbStorage, likesDbStorage, directorDbStorage), directorId);
-            }
-        } catch (EmptyResultDataAccessException e) {
-            throw new DirectorNotFound("");
+        directorDbStorage.getDirectorById(directorId);
+        if (sortBy.equals("year")) {
+            String sql = "SELECT * FROM FILMS " +
+                    "RIGHT JOIN (SELECT FILM_ID FROM FILMS_DIRECTORS WHERE DIRECTOR_ID = ?) FD ON FILMS.ID=FD.FILM_ID " +
+                    "JOIN MPA ON FILMS.MPA_ID=MPA.ID ORDER BY RELEASE_DATE";
+            return jdbcTemplate.query(sql, new FilmRowMapper(genreDbStorage, mpaDbStorage, likesDbStorage, directorDbStorage), directorId);
+        } else if (sortBy.equals("likes")) {
+            String sql = "SELECT * FROM FILMS " +
+                    "JOIN ((SELECT FILM_ID FROM FILMS_DIRECTORS WHERE DIRECTOR_ID = ?)) FD ON FILMS.ID=FD.FILM_ID " +
+                    "JOIN MPA ON FILMS.MPA_ID=MPA.ID " +
+                    "LEFT JOIN LIKES l ON FILMS.ID = l.FILM_ID " +
+                    "GROUP BY FILMS.ID " +
+                    "ORDER BY COUNT(USER_ID) DESC";
+            return jdbcTemplate.query(sql, new FilmRowMapper(genreDbStorage, mpaDbStorage, likesDbStorage, directorDbStorage), directorId);
         }
         return null;
     }
