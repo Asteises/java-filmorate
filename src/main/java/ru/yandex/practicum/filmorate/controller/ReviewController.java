@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exeption.ReviewNotFound;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -18,7 +19,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping
-    public Review addReview(@RequestBody Review review) {
+    public Review addReview(@RequestBody @Valid Review review) {
         return reviewService.addReview(review);
     }
 
@@ -33,7 +34,7 @@ public class ReviewController {
     }
 
     @GetMapping("/{id}")
-    public Review getReviewById(@PathVariable long id) throws ReviewNotFound {
+    public Review getReviewById(@PathVariable @Valid long id) throws ReviewNotFound {
         return reviewService.getReviewById(id);
     }
 

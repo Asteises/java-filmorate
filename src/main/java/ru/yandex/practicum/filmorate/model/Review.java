@@ -1,6 +1,12 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -11,9 +17,13 @@ public class Review {
 
     private long reviewId;
     private int useful;
-    private boolean isPositive;
+    @NotNull
+    private Boolean isPositive;
+    @NotNull
     private String content;
-    private long userId;
-    private long filmId;
+    @NotNull
+    private Long userId;
+    @NotNull
+    private Long filmId;
 
 }
