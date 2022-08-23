@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.repository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -28,6 +29,16 @@ public class ReviewDbStorage implements ReviewStorage {
     private final FilmDbStorage filmDbStorage;
     private final UserService userService;
 
+    public Boolean isReviewExist(long reviewId) {
+        String sql = "SELECT COUNT(*) FROM REVIEWS WHERE REVIEW_ID = ?";
+        int check = jdbcTemplate.queryForObject(sql, Integer.class, reviewId);
+        if (check != 0) {
+            return Boolean.TRUE;
+        } else {
+            return Boolean.FALSE;
+        }
+    }
+
     @Override
     public Review addReview(Review review) {
         String sql = "INSERT INTO REVIEWS (USEFUL, IS_POSITIVE, CONTENT, USER_ID, FILM_ID) VALUES (?, ?, ?, ?, ?)";
@@ -47,16 +58,24 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public Review updateReview(Review review) throws ReviewNotFound {
-        getReviewById(review.getReviewId());
-        String sql = "UPDATE REVIEWS SET (USEFUL, IS_POSITIVE, CONTENT, USER_ID, FILM_ID) WHERE REVIEW_ID = ?";
-        jdbcTemplate.update(sql,
-                review.getUseful(),
-                review.isPositive(),
-                review.getContent(),
-                review.getUserId(),
-                review.getFilmId(),
-                review.getReviewId());
-        return review;
+        if (isReviewExist(review.getReviewId())) {
+            String sql = "UPDATE REVIEWS SET USEFUL = ?, " +
+                    "IS_POSITIVE = ?, " +
+                    "CONTENT = ?, " +
+                    "USER_ID = ?, " +
+                    "FILM_ID = ? " +
+                    "WHERE REVIEW_ID = ?";
+            jdbcTemplate.update(sql,
+                    review.getUseful(),
+                    review.isPositive(),
+                    review.getContent(),
+                    review.getUserId(),
+                    review.getFilmId(),
+                    review.getReviewId());
+            return review;
+        } else {
+            throw new ReviewNotFound("");
+        }
     }
 
     @Override
@@ -71,8 +90,8 @@ public class ReviewDbStorage implements ReviewStorage {
         try {
             String sql = "SELECT * FROM REVIEWS WHERE REVIEW_ID = ?";
             return jdbcTemplate.queryForObject(sql, new ReviewRawMapper(), reviewId);
-        } catch (IllegalArgumentException e) {
-            throw new ReviewNotFound("");
+        } catch (EmptyResultDataAccessException e) {
+            throw new ReviewNotFound("Review  данным id не найден: " + review.getReviewId());
         }
     }
 
@@ -109,17 +128,33 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public Review addDislikeReview(long reviewId, long userId) throws ReviewNotFound, UserNotFound {
-        return null;
+        getReviewById(reviewId);
+        userService.getUserById(userId);
+        String sqlLike = "INSERT INTO REVIEWS_USERS (REVIEW_ID, USER_ID) VALUES (?, ?)";
+        String sqlReviewUseful = "UPDATE REVIEWS SET USEFUL = USEFUL - 1 WHERE REVIEW_ID = ?";
+        jdbcTemplate.update(sqlLike, reviewId, userId);
+        jdbcTemplate.update(sqlReviewUseful, reviewId);
+        return getReviewById(reviewId);
     }
 
     @Override
     public void deleteLikeReview(long reviewId, long userId) throws ReviewNotFound, UserNotFound {
-
+        getReviewById(reviewId);
+        userService.getUserById(userId);
+        String sqlLike = "DELETE FROM REVIEWS_USERS WHERE REVIEW_ID = ? AND USER_ID = ?";
+        String sqlReviewUseful = "UPDATE REVIEWS SET USEFUL = USEFUL - 1 WHERE REVIEW_ID = ?";
+        jdbcTemplate.update(sqlLike, reviewId, userId);
+        jdbcTemplate.update(sqlReviewUseful, reviewId);
     }
 
     @Override
     public void deleteDislikeReview(long reviewId, long userId) throws ReviewNotFound, UserNotFound {
-
+        getReviewById(reviewId);
+        userService.getUserById(userId);
+        String sqlLike = "DELETE FROM REVIEWS_USERS WHERE REVIEW_ID = ? AND USER_ID = ?";
+        String sqlReviewUseful = "UPDATE REVIEWS SET USEFUL = USEFUL + 1 WHERE REVIEW_ID = ?";
+        jdbcTemplate.update(sqlLike, reviewId, userId);
+        jdbcTemplate.update(sqlReviewUseful, reviewId);
     }
 
 }
