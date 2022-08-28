@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,8 +19,6 @@ public class ReviewService {
     public Review addReview(Review review) {
         return reviewStorage.addReview(review);
     }
-
-    //TODO Нужно ли выбрасывать исключение в сервисе и в котнроллере, если оно уже выбрасывается в сторадже?
 
     public Review updateReview(Review review) throws ReviewNotFound {
         return reviewStorage.updateReview(review);

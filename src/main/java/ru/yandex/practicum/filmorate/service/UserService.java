@@ -26,11 +26,11 @@ public class UserService {
     }
 
     public User getUserById(long userId) throws UserNotFound {
-       return userStorage.getUserById(userId);
+        return userStorage.getUserById(userId);
     }
 
-    public void updateUser(User user) throws UserNotFound {
-        userStorage.updateUser(user);
+    public User updateUser(User user) throws UserNotFound {
+        return userStorage.updateUser(user);
     }
 
     public void deleteUser(long id) throws UserNotFound {

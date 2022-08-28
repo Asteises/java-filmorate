@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.FilmNotFound;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
@@ -28,4 +29,21 @@ public interface FilmStorage {
 
     List<Film> getAllFilmsByDirector(int directorId, String sortBy);
 
+    List<Film> getSearchFilmsByTittleAndDirector(String query);
+
+    List<Film> getSearchFilmsByTittle(String query);
+
+    List<Film> getSearchFilmsByDirector(String query);
+
+    List<Film> getPopularByGenre(int genreId);
+
+    List<Film> getPopularFilmsByYear(String year);
+
+    List<Film> getPopularFilmsByGenreAndYear(int count, int genreId, String year);
+
+    List<Film> getCommonFilms(int userId, int friendId);
+
+    void setFilmDirectors(long filmId, List<Director> directors);
+
+    List<Film> getRecommendations(long userId);
 }

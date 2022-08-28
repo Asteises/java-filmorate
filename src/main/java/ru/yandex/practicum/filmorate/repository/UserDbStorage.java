@@ -13,7 +13,9 @@ import ru.yandex.practicum.filmorate.mapper.UserRowMapper;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.sql.*;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.Types;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -33,7 +35,7 @@ public class UserDbStorage implements UserStorage {
             user.setName(user.getLogin());
         }
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, new String[] {"ID"});
+            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"ID"});
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getLogin());
             ps.setString(3, user.getName());
@@ -70,46 +72,32 @@ public class UserDbStorage implements UserStorage {
             user.setFriends(userFriends);
             return user;
         } catch (EmptyResultDataAccessException e) {
-            throw new UserNotFound("");
+            throw new UserNotFound("Неверно указан id = " + id + " пользователя.");
         }
     }
 
     @Override
     public User updateUser(User user) throws UserNotFound {
-            getUserById(user.getId());
-            String sql = "UPDATE USERS SET " +
-                    "EMAIL = ?, " +
-                    "LOGIN = ?, " +
-                    "NAME = ?, " +
-                    "BIRTHDAY = ? " +
-                    "WHERE ID = ?";
-            jdbcTemplate.update(sql,
-                    user.getEmail(),
-                    user.getLogin(),
-                    user.getName(),
-                    user.getBirthday(),
-                    user.getId()
-            );
-            return user;
+        getUserById(user.getId()); // Проверяем наличие User
+        String sql = "UPDATE USERS SET " +
+                "EMAIL = ?, " +
+                "LOGIN = ?, " +
+                "NAME = ?, " +
+                "BIRTHDAY = ? " +
+                "WHERE ID = ?";
+        jdbcTemplate.update(sql,
+                user.getEmail(),
+                user.getLogin(),
+                user.getName(),
+                user.getBirthday(),
+                user.getId()
+        );
+        return user;
     }
 
     @Override
     public void deleteUser(long id) throws UserNotFound {
-        try {
-            getUserById(id);
-            String sql = "DELETE FROM USERS WHERE ID = ?";
-            String sqlLikes = "DELETE FROM LIKES WHERE USER_ID = ?";
-            String sqlEvents = "DELETE FROM EVENTS WHERE USER_ID = ?";
-            String sqlFriends = "DELETE FROM FRIENDS WHERE USER_ID = ?";
-            String sqlFiendsAsFriendId = "DELETE FROM FRIENDS WHERE FRIEND_ID = ?";
-            jdbcTemplate.update(sqlFriends, id);
-            jdbcTemplate.update(sqlFiendsAsFriendId, id);
-            jdbcTemplate.update(sqlLikes, id);
-            jdbcTemplate.update(sqlEvents, id);
-            jdbcTemplate.update(sql, id);
-        } catch (IllegalArgumentException e) {
-            throw new UserNotFound("");
-        }
+        String sql = "DELETE FROM USERS WHERE ID = ?";
+        jdbcTemplate.update(sql, id);
     }
-
 }
